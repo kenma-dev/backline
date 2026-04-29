@@ -12,6 +12,10 @@ function createMockHash(prefix: string): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 15)}`;
 }
 
+export function getCampaignOperationMode(): 'contract' | 'demo' {
+  return env.contractId ? 'contract' : 'demo';
+}
+
 export async function listCampaigns(): Promise<Campaign[]> {
   return readCampaigns();
 }
@@ -41,7 +45,7 @@ export async function createCampaign(
   return {
     campaign,
     hash: createMockHash('create'),
-    mode: 'demo',
+    mode: getCampaignOperationMode(),
   };
 }
 
@@ -60,7 +64,7 @@ export async function backCampaign(
   return {
     campaign,
     hash: createMockHash('back'),
-    mode: 'demo',
+    mode: getCampaignOperationMode(),
   };
 }
 
@@ -80,7 +84,7 @@ export async function claimCampaignFunds(
   return {
     campaign: claimDemoCampaign(campaignId),
     hash: createMockHash('claim'),
-    mode: 'demo',
+    mode: getCampaignOperationMode(),
   };
 }
 
@@ -101,6 +105,6 @@ export async function refundCampaignContribution(
   return {
     campaign: refundDemoCampaign(campaignId, address),
     hash: createMockHash('refund'),
-    mode: 'demo',
+    mode: getCampaignOperationMode(),
   };
 }

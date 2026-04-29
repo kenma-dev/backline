@@ -1,6 +1,7 @@
 import { CampaignGrid } from '@/components/campaign-grid';
 import { Hero } from '@/components/hero';
 import { HomeHighlights } from '@/components/home-highlights';
+import { RecentActivity } from '@/components/recent-activity';
 
 export default function HomePage(): JSX.Element {
   return (
@@ -18,6 +19,7 @@ export default function HomePage(): JSX.Element {
         </div>
         <CampaignGrid featured />
       </section>
+      <RecentActivity />
       <section className="glass-panel rounded-[32px] border border-white/70 p-8 shadow-soft">
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-ink/45">
           Built for clarity

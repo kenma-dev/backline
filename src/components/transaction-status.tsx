@@ -1,4 +1,5 @@
 import { getExplorerTransactionUrl } from '@/lib/balance';
+import { truncateAddress } from '@/lib/format';
 import type { TransactionState } from '@/types';
 
 const statusStyles: Record<TransactionState['status'], string> = {
@@ -27,6 +28,11 @@ export function TransactionStatus({
             : 'Failed'}
       </p>
       {state.message ? <p className="mt-1">{state.message}</p> : null}
+      {state.hash ? (
+        <p className="mt-3 text-xs font-semibold uppercase tracking-[0.22em] opacity-75">
+          Tx hash: {truncateAddress(state.hash)}
+        </p>
+      ) : null}
       {state.hash ? (
         <a
           href={getExplorerTransactionUrl(state.hash)}
