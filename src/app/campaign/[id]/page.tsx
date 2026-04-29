@@ -35,7 +35,7 @@ export default function CampaignDetailsPage(): JSX.Element {
   const { session } = useWallet();
   const balanceQuery = useBalance(session?.address ?? null);
   const backMutation = useBackCampaign(session?.address ?? null);
-  const claimMutation = useClaimFunds();
+  const claimMutation = useClaimFunds(session?.address ?? null);
   const refundMutation = useRefundCampaign(session?.address ?? null);
   const [amount, setAmount] = useState('25');
   const [txState, setTxState] = useState<TransactionState>({ status: 'idle' });

@@ -40,6 +40,7 @@ fn creates_and_reads_campaign() {
     assert_eq!(campaign.creator, creator);
     assert_eq!(campaign.goal, 500);
     assert_eq!(campaign.raised, 0);
+    assert_eq!(client.get_campaign_count(), 1);
 }
 
 #[test]
@@ -87,6 +88,33 @@ fn refunds_failed_campaigns_after_deadline() {
 
     let refunded = client.refund(&campaign_id, &backer);
     assert_eq!(refunded, 250);
+    assert_eq!(client.get_total_raised(&campaign_id), 0);
+    assert_eq!(client.get_backers_count(&campaign_id), 0);
+}
+
+#[test]
+fn returns_backer_snapshots_for_active_contributions() {
+    let env = Env::default();
+    env.mock_all_auths();
+    env.ledger().with_mut(|ledger| {
+        ledger.timestamp = 100;
+    });
+
+    let creator = Address::generate(&env);
+    let backer = Address::generate(&env);
+    let contract_id = env.register(CrowdfundContract, ());
+    let client = CrowdfundContractClient::new(&env, &contract_id);
+
+    let campaign_id = create_campaign_fixture(&env, &client, &creator, 1_000, 1_500);
+    client.back_campaign(&campaign_id, &backer, &125);
+
+    let backers = client.get_backers(&campaign_id);
+    let snapshot = backers.get(0).unwrap();
+
+    assert_eq!(backers.len(), 1);
+    assert_eq!(snapshot.backer, backer);
+    assert_eq!(snapshot.amount, 125);
+    assert_eq!(snapshot.timestamp, 100);
 }
 
 #[test]

@@ -2,9 +2,11 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { backCampaign } from '@/lib/contract-client';
+import { useWallet } from '@/hooks/use-wallet';
 
 export function useBackCampaign(address: string | null) {
   const queryClient = useQueryClient();
+  const { signTransaction } = useWallet();
 
   return useMutation({
     mutationFn: async ({
@@ -18,7 +20,7 @@ export function useBackCampaign(address: string | null) {
         throw new Error('Connect a wallet before backing a campaign.');
       }
 
-      return backCampaign(campaignId, address, amount);
+      return backCampaign(campaignId, address, amount, signTransaction);
     },
     onSuccess: async ({ campaign }) => {
       await Promise.all([

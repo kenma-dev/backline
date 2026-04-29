@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { stellarNetworkPassphrase } from '@/lib/balance';
 import type { WalletId, WalletSession } from '@/types';
 
 const STORAGE_KEY = 'backline:last-wallet-session';
@@ -15,6 +16,7 @@ interface WalletContextValue {
   connectWallet: (walletId: WalletId) => Promise<void>;
   disconnectWallet: () => void;
   clearWalletError: () => void;
+  signTransaction: (xdr: string, address?: string) => Promise<string>;
 }
 
 const WalletContext = createContext<WalletContextValue | undefined>(undefined);
@@ -150,6 +152,38 @@ export function WalletProvider({
 
         if (typeof window !== 'undefined') {
           window.localStorage.removeItem(STORAGE_KEY);
+        }
+      },
+      signTransaction: async (xdr, address) => {
+        if (isTestWalletEnabled()) {
+          return xdr;
+        }
+
+        const signerAddress = address ?? session?.address;
+
+        if (!signerAddress) {
+          throw new Error('Connect a wallet before signing a transaction.');
+        }
+
+        try {
+          const { StellarWalletsKit } = await loadWalletKit();
+          const response = await StellarWalletsKit.signTransaction(xdr, {
+            address: signerAddress,
+            networkPassphrase: stellarNetworkPassphrase,
+          });
+
+          return response.signedTxXdr;
+        } catch (error) {
+          const message =
+            error instanceof Error
+              ? error.message
+              : 'Unable to sign transaction with the connected wallet.';
+
+          if (/cancel|reject|declin/i.test(message)) {
+            throw new Error('Transaction cancelled by user.');
+          }
+
+          throw new Error(message);
         }
       },
       connectWallet: async (walletId) => {

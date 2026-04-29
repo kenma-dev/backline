@@ -27,6 +27,14 @@ pub struct Contribution {
     pub amount: i128,
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[contracttype]
+pub struct BackerSnapshot {
+    pub backer: Address,
+    pub amount: i128,
+    pub timestamp: u64,
+}
+
 #[derive(Clone)]
 #[contracttype]
 pub enum DataKey {
@@ -35,6 +43,7 @@ pub enum DataKey {
     TotalRaised(u32),
     Backers(u32),
     Contribution(u32, Address),
+    ContributionTimestamp(u32, Address),
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -118,8 +127,39 @@ fn has_deadline_passed(env: &Env, deadline: u64) -> bool {
     env.ledger().timestamp() >= deadline
 }
 
+fn get_contribution_amount(env: &Env, campaign_id: u32, backer: &Address) -> i128 {
+    env.storage()
+        .persistent()
+        .get(&DataKey::Contribution(campaign_id, backer.clone()))
+        .unwrap_or(0)
+}
+
+fn set_contribution_amount(env: &Env, campaign_id: u32, backer: &Address, amount: i128) {
+    env.storage()
+        .persistent()
+        .set(&DataKey::Contribution(campaign_id, backer.clone()), &amount);
+}
+
+fn get_contribution_timestamp(env: &Env, campaign_id: u32, backer: &Address) -> u64 {
+    env.storage()
+        .persistent()
+        .get(&DataKey::ContributionTimestamp(campaign_id, backer.clone()))
+        .unwrap_or(0)
+}
+
+fn set_contribution_timestamp(env: &Env, campaign_id: u32, backer: &Address, timestamp: u64) {
+    env.storage().persistent().set(
+        &DataKey::ContributionTimestamp(campaign_id, backer.clone()),
+        &timestamp,
+    );
+}
+
 #[contractimpl]
 impl CrowdfundContract {
+    pub fn get_campaign_count(env: Env) -> u32 {
+        campaign_count(&env)
+    }
+
     pub fn create_campaign(
         env: Env,
         creator: Address,
@@ -173,15 +213,9 @@ impl CrowdfundContract {
             return Err(ContractError::CampaignEnded);
         }
 
-        let existing = env
-            .storage()
-            .persistent()
-            .get::<_, i128>(&DataKey::Contribution(campaign_id, backer.clone()))
-            .unwrap_or(0);
-        env.storage().persistent().set(
-            &DataKey::Contribution(campaign_id, backer.clone()),
-            &(existing + amount),
-        );
+        let existing = get_contribution_amount(&env, campaign_id, &backer);
+        set_contribution_amount(&env, campaign_id, &backer, existing + amount);
+        set_contribution_timestamp(&env, campaign_id, &backer, env.ledger().timestamp());
 
         let mut backers = get_backers_internal(&env, campaign_id);
         if existing == 0 {
@@ -213,7 +247,38 @@ impl CrowdfundContract {
 
     pub fn get_backers_count(env: Env, campaign_id: u32) -> Result<u32, ContractError> {
         let _ = get_campaign_or_error(&env, campaign_id)?;
-        Ok(get_backers_internal(&env, campaign_id).len())
+        let backers = get_backers_internal(&env, campaign_id);
+        let mut active_backers = 0_u32;
+
+        for backer in backers.iter() {
+            if get_contribution_amount(&env, campaign_id, &backer) > 0 {
+                active_backers += 1;
+            }
+        }
+
+        Ok(active_backers)
+    }
+
+    pub fn get_backers(env: Env, campaign_id: u32) -> Result<Vec<BackerSnapshot>, ContractError> {
+        let _ = get_campaign_or_error(&env, campaign_id)?;
+        let backers = get_backers_internal(&env, campaign_id);
+        let mut snapshots = Vec::new(&env);
+
+        for backer in backers.iter() {
+            let amount = get_contribution_amount(&env, campaign_id, &backer);
+
+            if amount <= 0 {
+                continue;
+            }
+
+            snapshots.push_back(BackerSnapshot {
+                backer: backer.clone(),
+                amount,
+                timestamp: get_contribution_timestamp(&env, campaign_id, &backer),
+            });
+        }
+
+        Ok(snapshots)
     }
 
     pub fn claim_funds(
@@ -255,17 +320,21 @@ impl CrowdfundContract {
             return Err(ContractError::GoalMet);
         }
 
-        let key = DataKey::Contribution(campaign_id, backer.clone());
-        let contribution = env
-            .storage()
-            .persistent()
-            .get::<_, i128>(&key)
-            .unwrap_or(0);
+        let contribution = get_contribution_amount(&env, campaign_id, &backer);
         if contribution <= 0 {
             return Err(ContractError::NoContribution);
         }
 
-        env.storage().persistent().set(&key, &0_i128);
+        set_contribution_amount(&env, campaign_id, &backer, 0);
+        set_contribution_timestamp(&env, campaign_id, &backer, 0);
+
+        let next_total = get_total_raised_internal(&env, campaign_id) - contribution;
+        set_total_raised(&env, campaign_id, next_total);
+
+        let mut updated_campaign = campaign;
+        updated_campaign.raised = next_total;
+        write_campaign(&env, &updated_campaign);
+
         env.events().publish(
             (Symbol::new(&env, "refund"), campaign_id),
             Contribution {

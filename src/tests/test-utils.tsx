@@ -1,8 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import type { ReactElement } from 'react';
+import { WalletProvider } from '@/hooks/use-wallet';
 
 export function renderWithQueryClient(ui: ReactElement) {
+  Object.assign(window, { __BACKLINE_TEST_WALLET__: true });
+
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -10,5 +13,9 @@ export function renderWithQueryClient(ui: ReactElement) {
     },
   });
 
-  return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+  return render(
+    <WalletProvider>
+      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+    </WalletProvider>,
+  );
 }
