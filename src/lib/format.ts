@@ -46,3 +46,24 @@ export function formatRelativeUpdate(updatedAt: number): string {
   const seconds = Math.max(0, Math.floor((Date.now() - updatedAt) / 1000));
   return `${seconds} second${seconds === 1 ? '' : 's'} ago`;
 }
+
+export function toDateInputValue(value: string): string {
+  if (!value) {
+    return '';
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
+
+  return date.toISOString().slice(0, 10);
+}
+
+export function fromDateInputValue(value: string): string {
+  if (!value) {
+    return '';
+  }
+
+  return new Date(`${value}T23:59:59.000Z`).toISOString();
+}

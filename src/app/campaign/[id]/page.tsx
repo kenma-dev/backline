@@ -204,6 +204,7 @@ export default function CampaignDetailsPage(): JSX.Element {
                 campaignId: campaign.id,
                 amount: numericAmount,
               });
+              setAmount('25');
               setTxState({
                 status: 'success',
                 message: `Contribution confirmed in ${result.mode} mode.`,

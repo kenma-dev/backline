@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/use-create-campaign';
 import { useWallet } from '@/hooks/use-wallet';
 import { TransactionStatus } from '@/components/transaction-status';
+import { fromDateInputValue, toDateInputValue } from '@/lib/format';
 import type { CampaignFormValues, TransactionState } from '@/types';
 
 const initialValues: CampaignFormValues = {
@@ -46,6 +47,14 @@ export default function CreateCampaignPage(): JSX.Element {
               setTxState({
                 status: 'error',
                 message: 'Complete every required field before launching.',
+              });
+              return;
+            }
+
+            if (new Date(values.deadline).getTime() <= Date.now()) {
+              setTxState({
+                status: 'error',
+                message: 'Choose a deadline in the future.',
               });
               return;
             }
@@ -126,11 +135,11 @@ export default function CreateCampaignPage(): JSX.Element {
               <input
                 id="deadline"
                 type="date"
-                value={values.deadline}
+                value={toDateInputValue(values.deadline)}
                 onChange={(event) =>
                   setValues((current) => ({
                     ...current,
-                    deadline: new Date(event.target.value).toISOString(),
+                    deadline: fromDateInputValue(event.target.value),
                   }))
                 }
                 className="mt-2 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 outline-none transition focus:border-ember"
