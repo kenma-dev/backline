@@ -1,3 +1,4 @@
+import type { Route } from 'next';
 import { CampaignCard } from '@/components/campaign-card';
 import { EmptyState } from '@/components/empty-state';
 import type { Campaign } from '@/types';
@@ -19,7 +20,7 @@ export function CampaignCollection({
   emptyTitle: string;
   emptyDescription: string;
   emptyCtaLabel?: string;
-  emptyCtaHref?: string;
+  emptyCtaHref?: Route;
 }): JSX.Element {
   return (
     <section className="space-y-4">

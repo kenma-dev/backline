@@ -1,3 +1,4 @@
+import type { Route } from 'next';
 import Link from 'next/link';
 
 export function EmptyState({
@@ -11,7 +12,7 @@ export function EmptyState({
   title: string;
   description: string;
   ctaLabel?: string;
-  ctaHref?: string;
+  ctaHref?: Route;
 }): JSX.Element {
   return (
     <div className="glass-panel rounded-[28px] border border-white/70 p-8 text-center shadow-soft">

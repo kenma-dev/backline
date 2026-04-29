@@ -1,97 +1,66 @@
 # Backline
 
-Backline is a Stellar testnet crowdfunding dApp built with Next.js, TypeScript, Tailwind CSS, React Query, and a Soroban smart contract. Creators can launch campaigns with goals and deadlines, backers can contribute XLM, and campaigns support claim/refund flows after the deadline.
+Backline is a crowdfunding platform built on Stellar with a Next.js frontend and a Soroban smart contract. Creators can launch campaigns with funding goals and deadlines, supporters can back them with XLM, and campaigns follow clear claim and refund rules after the deadline.
 
-## Status
+This repository contains the full app experience, the Soroban contract workspace, and the live testnet contract configuration currently used by the frontend.
 
-This repository is actively in progress.
+## Context
 
-Implemented so far:
-- Next.js frontend scaffold with typed React structure
-- Multi-wallet flow wired toward StellarWalletsKit
-- Campaign list, details, and create pages
-- Cached balance and campaign hooks
-- Transaction status UI and loading states
-- Soroban crowdfund contract workspace with Rust tests
-- Claim and refund actions in the frontend live contract flow
-- Live testnet contract deployment with seeded on-chain campaigns
+This README includes the following sections — click any item to jump there:
 
-Still pending before the full three-level submission is complete:
-- Browser-side QA across Freighter, Albedo, and xBull against the live contract
-- Final screenshots, demo video, and hosted deployment links
+- [Overview](#overview)
+- [Highlights](#highlights)
+- [Live links](#live-links)
+- [Live contract details](#live-contract-details)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Tech stack](#tech-stack)
+- [Project structure](#project-structure)
+- [Test status](#test-status)
+- [Getting started](#getting-started)
+- [Smart contract workflow](#smart-contract-workflow)
+- [Product behavior](#product-behavior)
 
-## Features
+## Overview
 
-- Multi-wallet connection UX for Freighter, Albedo, and xBull
-- Wallet balance display with cache-aware UI
-- Campaign creation and backing flow
-- Claim funds after a successful campaign deadline
-- Refund flow for unsuccessful campaigns after deadline
-- Loading spinners, shimmer placeholders, and transaction feedback
-- React Query caching with refetch intervals for campaign updates
-- Soroban contract workspace for campaign lifecycle rules
+- Product: `Backline`
+- Category: crowdfunding dApp
+- Network used today: Stellar testnet
+- Frontend: Next.js, React, TypeScript, Tailwind CSS
+- Smart contract: Soroban Rust contract
+- Wallet support: Freighter
+- Package manager: `pnpm`
 
-## Tech Stack
+## Highlights
 
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-- React Query
-- StellarWalletsKit
-- `@stellar/stellar-sdk`
-- Soroban / `soroban-sdk`
-- Vitest
+- Campaign creation with title, description, goal, and deadline
+- Campaign browsing with filtering, sorting, progress tracking, and status grouping
+- Campaign details with live backing, claim, and refund actions
+- Freighter wallet connection and transaction signing
+- Cached campaign and balance reads with React Query
+- Toast-based transaction feedback for pending, success, and error states
+- Creator dashboard with account-specific campaign activity
+- Real Soroban contract deployment and live contract reads
 
-## Environment Variables
+## Live links
 
-Copy `.env.example` to `.env` and fill in values as needed:
+- Live website: `Add deployed URL here`
 
-```bash
-NEXT_PUBLIC_NETWORK=testnet
-NEXT_PUBLIC_CONTRACT_ID=CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX
-NEXT_PUBLIC_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
-NEXT_PUBLIC_HORIZON_URL=https://horizon-testnet.stellar.org
-NEXT_PUBLIC_STELLAR_EXPERT_URL=https://stellar.expert/explorer/testnet
-```
+- Demo video: `Add Loom or YouTube URL here`
 
-## Local Development
+- Contract on Stellar Lab:
+  `https://lab.stellar.org/r/testnet/contract/CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX`
+  
+- Deploy transaction on Stellar Expert:
+  `https://stellar.expert/explorer/testnet/tx/d9ee7961280a9ac8df7ec633e0534e108b47b29dbae542ee70697f80a4b50e19`
 
-Install dependencies:
+## Live contract details
 
-```bash
-pnpm install
-```
+- Contract ID:
+  `CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX`
 
-Run the frontend:
+### Contract methods
 
-```bash
-pnpm dev
-```
-
-Run frontend tests:
-
-```bash
-pnpm test
-```
-
-Run Soroban contract tests:
-
-```bash
-pnpm contract:test
-```
-
-Build the Soroban contract:
-
-```bash
-pnpm contract:build
-```
-
-## Soroban Contract
-
-The Soroban workspace lives in [contracts/crowdfund](/home/pk/Documents/Stellar/project-1/contracts/crowdfund).
-
-Current contract surface:
 - `get_campaign_count`
 - `create_campaign`
 - `back_campaign`
@@ -102,30 +71,190 @@ Current contract surface:
 - `claim_funds`
 - `refund`
 
-## Live Testnet State
+## Screenshots
 
-- Contract ID: `CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX`
-- Deployer address: `GDCDJTGUX4YWLQ3V4YPQLX7FNEIP2EZ3NJKSNSB64FGGBOOHKBKNXIYR`
-- Backer address: `GCHU2DEMMEP4HQ7H7ARW4DGTOZRAXNZEOBDA6N77XU4XOK3JD5SBDG2U`
-- Deploy transaction:
-  `https://stellar.expert/explorer/testnet/tx/d9ee7961280a9ac8df7ec633e0534e108b47b29dbae542ee70697f80a4b50e19`
-- Seeded campaigns:
-  `1` `Backline Testnet Showcase` with `25.00 XLM` raised
-  `2` `Backline Refund Test` expired before backing and remains empty
-  `3` `Backline Refund Window` was backed with `5.00 XLM` and later refunded to `0.00 XLM`
+The README is ready for screenshots, but the image assets are not in the repo yet.
 
-## Submission Placeholders
+Add these when available:
 
-These need to be filled in before final delivery:
+- Wallet connected state
+- Campaign list page
+- Campaign detail transaction success state
+- Dashboard page
+- Passing test results screenshot
 
-- Contract address: `CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX`
-- Live demo link: `TBD`
-- Demo video link: `TBD`
-- Wallet screenshot: `TBD`
-- Campaign list screenshot: `TBD`
-- Transaction screenshot: `TBD`
-- Test results screenshot: `TBD`
 
-## License
+## Features
 
-MIT
+### Core product
+
+- Home page focused on product marketing and featured campaigns
+- Campaign listing page with active campaigns prioritized ahead of ended ones
+- Campaign detail page with recent backers, contribution form, and campaign actions
+- Creator dashboard with created campaigns, backed campaigns, claim queue, and refund queue
+- Create campaign page with preview and draft persistence
+
+### Wallet and transaction flow
+
+- Freighter wallet connect and disconnect flow
+- Signed Soroban transactions for:
+  - `create_campaign`
+  - `back_campaign`
+  - `claim_funds`
+  - `refund`
+- Transaction hash feedback with Stellar Expert links
+- Friendly toast errors for cancellation, missing wallet, and submission failures
+
+### Contract-backed data
+
+- Campaign list loaded from live contract storage
+- Individual campaign details loaded from the deployed contract
+- Backer counts and recent contribution data loaded from contract reads
+- Polling-based refresh through React Query
+
+## Tech stack
+
+### Frontend
+
+- Next.js `16.2.4`
+- React `19.2.5`
+- TypeScript `6.0.3`
+- Tailwind CSS `4.2.4`
+- `@tanstack/react-query`
+- `@stellar/stellar-sdk`
+- `@stellar/freighter-api`
+
+### Smart contract
+
+- Rust
+- `soroban-sdk`
+
+### Testing
+
+- Vitest
+- Testing Library
+
+## Project structure
+
+```text
+.
+├── contracts/
+│   └── crowdfund/
+│       ├── src/
+│       └── Cargo.toml
+├── src/
+│   ├── app/
+│   ├── components/
+│   ├── hooks/
+│   ├── lib/
+│   ├── tests/
+│   └── types/
+├── .env.example
+├── package.json
+└── README.md
+```
+
+
+## Test status
+
+Verified locally:
+
+```bash
+$ pnpm test
+
+Test Files  3 passed (3)
+Tests       3 passed (3)
+```
+
+Covered flows:
+
+- Wallet connect and disconnect flow
+- Campaign data fetching
+- Backing transaction mutation flow
+
+## Getting started
+
+### Prerequisites
+
+- Node.js `18+`
+- `pnpm`
+- Rust toolchain
+- `wasm32v1-none` target
+- Freighter browser extension
+
+### Install
+
+```bash
+pnpm install
+```
+
+### Environment variables
+
+Copy `.env.example` to `.env.local`:
+
+```bash
+NEXT_PUBLIC_NETWORK=testnet
+NEXT_PUBLIC_CONTRACT_ID=CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX
+NEXT_PUBLIC_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+NEXT_PUBLIC_HORIZON_URL=https://horizon-testnet.stellar.org
+NEXT_PUBLIC_STELLAR_EXPERT_URL=https://stellar.expert/explorer/testnet
+```
+
+### Run the app
+
+```bash
+pnpm dev
+```
+
+### Run frontend tests
+
+```bash
+pnpm test
+```
+
+### Type check
+
+```bash
+pnpm exec tsc --noEmit
+```
+
+## Smart contract workflow
+
+### Run contract tests
+
+```bash
+pnpm contract:test
+```
+
+### Build the contract
+
+```bash
+pnpm contract:build
+```
+
+### Manual deploy command
+
+```bash
+stellar contract deploy \
+  --wasm target/wasm32v1-none/release/backline_crowdfund.wasm \
+  --source-account earnify-admin \
+  --network testnet \
+  --alias backline-testnet
+```
+
+## Product behavior
+
+### Campaign lifecycle
+
+1. A creator launches a campaign with a goal and deadline.
+2. Backers contribute XLM by signing Soroban transactions with Freighter.
+3. Active campaigns stay visible first in campaign listings.
+4. If a campaign reaches its goal and the deadline passes, the creator can claim funds.
+5. If a campaign misses its goal and the deadline passes, backers can request refunds.
+
+### Data and caching
+
+- Campaign data uses React Query caching
+- Balance reads are cached and refreshed after mutations
+- Campaign detail reads are refetched on an interval for near-live updates
+
