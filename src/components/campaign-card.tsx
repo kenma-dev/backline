@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { formatXlm, getCampaignStatus, getDaysRemaining } from '@/lib/format';
+import { formatCountdownLabel, formatXlm, getCampaignStatus, truncateAddress } from '@/lib/format';
 import type { Campaign, CampaignStatus } from '@/types';
 import { ProgressBar } from '@/components/progress-bar';
 
@@ -23,10 +23,15 @@ export function CampaignCard({
           <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${badgeStyles[status]}`}>
             {status}
           </span>
+          {campaign.claimed ? (
+            <span className="ml-2 inline-flex rounded-full bg-pine/12 px-3 py-1 text-xs font-semibold text-pine">
+              claimed
+            </span>
+          ) : null}
           <h3 className="mt-4 font-display text-2xl text-ink">{campaign.title}</h3>
         </div>
         <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-ink/60">
-          {getDaysRemaining(campaign.deadline)} days left
+          {formatCountdownLabel(campaign.deadline)}
         </span>
       </div>
       <p className="mt-4 line-clamp-3 text-sm leading-6 text-ink/72">{campaign.description}</p>
@@ -48,7 +53,7 @@ export function CampaignCard({
         </div>
         <div>
           <dt className="text-ink/45">Creator</dt>
-          <dd className="mt-1 font-semibold">Testnet</dd>
+          <dd className="mt-1 font-semibold">{truncateAddress(campaign.creator)}</dd>
         </div>
       </dl>
       <Link

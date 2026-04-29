@@ -28,6 +28,35 @@ export function getDaysRemaining(deadline: string): number {
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
+export function formatDeadline(deadline: string): string {
+  return new Date(deadline).toLocaleString();
+}
+
+export function formatCountdownLabel(deadline: string): string {
+  const ms = new Date(deadline).getTime() - Date.now();
+
+  if (ms <= 0) {
+    return 'Ended';
+  }
+
+  const hours = Math.floor(ms / (1000 * 60 * 60));
+  if (hours < 24) {
+    return `${hours}h left`;
+  }
+
+  return `${getDaysRemaining(deadline)} days left`;
+}
+
+export function getUserContribution(campaign: Campaign, address: string | null): number {
+  if (!address) {
+    return 0;
+  }
+
+  return campaign.backers.reduce((sum, backer) => {
+    return backer.address === address ? sum + backer.amount : sum;
+  }, 0);
+}
+
 export function getCampaignStatus(campaign: Campaign): 'active' | 'funded' | 'ended' {
   const isEnded = new Date(campaign.deadline).getTime() <= Date.now();
 

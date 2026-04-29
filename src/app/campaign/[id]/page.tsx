@@ -9,11 +9,19 @@ import { useBalance } from '@/hooks/use-balance';
 import { useClaimFunds } from '@/hooks/use-claim-funds';
 import { useRefundCampaign } from '@/hooks/use-refund-campaign';
 import { CachedAt } from '@/components/cached-at';
+import { CampaignRolePanel } from '@/components/campaign-role-panel';
 import { LoadingSpinner } from '@/components/loading-spinner';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import { ProgressBar } from '@/components/progress-bar';
 import { TransactionStatus } from '@/components/transaction-status';
-import { formatXlm, getCampaignStatus, getDaysRemaining, truncateAddress } from '@/lib/format';
+import {
+  formatDeadline,
+  formatXlm,
+  getCampaignStatus,
+  getDaysRemaining,
+  getUserContribution,
+  truncateAddress,
+} from '@/lib/format';
 import type { TransactionState } from '@/types';
 
 export default function CampaignDetailsPage(): JSX.Element {
@@ -60,12 +68,13 @@ export default function CampaignDetailsPage(): JSX.Element {
   const status = getCampaignStatus(campaign);
   const isCreator = session?.address === campaign.creator;
   const deadlinePassed = new Date(campaign.deadline).getTime() <= Date.now();
+  const contribution = getUserContribution(campaign, session?.address ?? null);
   const canClaim = isCreator && deadlinePassed && campaign.raised >= campaign.goal && !campaign.claimed;
   const canRefund =
     Boolean(session?.address) &&
     deadlinePassed &&
     campaign.raised < campaign.goal &&
-    campaign.backers.some((backer) => backer.address === session?.address);
+    contribution > 0;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
@@ -101,7 +110,7 @@ export default function CampaignDetailsPage(): JSX.Element {
           <div>
             <dt className="text-sm text-ink/45">Deadline</dt>
             <dd className="mt-2 font-semibold text-ink">
-              {new Date(campaign.deadline).toLocaleString()}
+              {formatDeadline(campaign.deadline)}
             </dd>
           </div>
           <div>
@@ -109,6 +118,14 @@ export default function CampaignDetailsPage(): JSX.Element {
             <dd className="mt-2 font-semibold text-ink">{getDaysRemaining(campaign.deadline)} days</dd>
           </div>
         </dl>
+        <CampaignRolePanel
+          isCreator={Boolean(isCreator)}
+          contribution={contribution}
+          deadlinePassed={deadlinePassed}
+          canClaim={canClaim}
+          canRefund={canRefund}
+          deadline={campaign.deadline}
+        />
         <div className="mt-10">
           <h2 className="font-display text-2xl text-ink">Recent backers</h2>
           <div className="mt-4 space-y-3">

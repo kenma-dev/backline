@@ -1,7 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
+import { AppModePanel } from '@/components/app-mode-panel';
 import { CampaignGrid } from '@/components/campaign-grid';
+import { useWallet } from '@/hooks/use-wallet';
 import type { CampaignStatus } from '@/types';
 
 const filters: Array<{ label: string; value: 'all' | CampaignStatus }> = [
@@ -13,6 +16,7 @@ const filters: Array<{ label: string; value: 'all' | CampaignStatus }> = [
 
 export default function CampaignsPage(): JSX.Element {
   const [filter, setFilter] = useState<'all' | CampaignStatus>('all');
+  const { session } = useWallet();
 
   return (
     <div className="space-y-8">
@@ -22,6 +26,20 @@ export default function CampaignsPage(): JSX.Element {
         <p className="mt-4 max-w-2xl text-base leading-7 text-ink/72">
           Track live progress, see how many supporters joined, and back projects with your Stellar wallet.
         </p>
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          {session ? (
+            <Link
+              href="/create"
+              className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90"
+            >
+              Create Campaign
+            </Link>
+          ) : (
+            <span className="rounded-full bg-sun/18 px-4 py-2 text-sm font-semibold text-amber-900">
+              Connect a wallet to create a campaign
+            </span>
+          )}
+        </div>
         <div className="mt-6 flex flex-wrap gap-3">
           {filters.map((item) => (
             <button
@@ -39,6 +57,7 @@ export default function CampaignsPage(): JSX.Element {
           ))}
         </div>
       </section>
+      <AppModePanel />
       <CampaignGrid filter={filter} />
     </div>
   );

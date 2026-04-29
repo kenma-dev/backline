@@ -184,8 +184,13 @@ export function refundDemoCampaign(campaignId: number, address: string): Campaig
       return campaign;
     }
 
+    const refundedAmount = campaign.backers.reduce((sum, backer) => {
+      return backer.address === address ? sum + backer.amount : sum;
+    }, 0);
+
     return {
       ...campaign,
+      raised: Math.max(0, campaign.raised - refundedAmount),
       backers: campaign.backers.filter((backer) => backer.address !== address),
     };
   });
