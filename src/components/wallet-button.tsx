@@ -7,8 +7,10 @@ import { useWallet } from '@/hooks/use-wallet';
 
 export function WalletButton(): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
   const { session, connectWallet, disconnectWallet, isConnecting, connectionLabel, errorMessage } =
     useWallet();
+  const selectedWallet = walletOptions.find((wallet) => wallet.id === selectedWalletId);
 
   if (session) {
     return (
@@ -63,6 +65,7 @@ export function WalletButton(): JSX.Element {
                   key={wallet.id}
                   type="button"
                   onClick={async () => {
+                    setSelectedWalletId(wallet.id);
                     try {
                       await connectWallet(wallet.id);
                       setIsOpen(false);
@@ -86,6 +89,16 @@ export function WalletButton(): JSX.Element {
             {errorMessage ? (
               <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                 <p>{errorMessage}</p>
+                {errorMessage.toLowerCase().includes('not installed') && selectedWallet ? (
+                  <a
+                    href={selectedWallet.installUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 inline-flex font-semibold underline underline-offset-4"
+                  >
+                    Install {selectedWallet.name}
+                  </a>
+                ) : null}
               </div>
             ) : null}
           </div>

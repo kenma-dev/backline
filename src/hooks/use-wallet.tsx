@@ -1,9 +1,11 @@
 'use client';
 
+import { KitEventType, Networks, StellarWalletsKit } from '@creit.tech/stellar-wallets-kit';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { WalletId, WalletSession } from '@/types';
 
 const STORAGE_KEY = 'backline:last-wallet-session';
+const TEST_WALLET_KEY = '__BACKLINE_TEST_WALLET__';
 
 interface WalletContextValue {
   session: WalletSession | null;
@@ -20,6 +22,20 @@ const WalletContext = createContext<WalletContextValue | undefined>(undefined);
 async function resolveMockAddress(walletId: WalletId): Promise<string> {
   const prefix = walletId === 'freighter' ? 'GFREIGHTER' : walletId === 'albedo' ? 'GALBEDO' : 'GXBULL';
   return `${prefix}${'1'.repeat(47 - prefix.length)}`;
+}
+
+function isTestWalletEnabled(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  return Boolean(Reflect.get(window as Record<string, unknown>, TEST_WALLET_KEY));
+}
+
+function initWalletKit(): void {
+  StellarWalletsKit.init({
+    network: Networks.TESTNET,
+  });
 }
 
 function getWindowValue(key: string): unknown {
@@ -57,6 +73,8 @@ export function WalletProvider({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    initWalletKit();
+
     if (typeof window === 'undefined') {
       return;
     }
@@ -74,6 +92,19 @@ export function WalletProvider({
     }
   }, []);
 
+  useEffect(() => {
+    const offDisconnect = StellarWalletsKit.on(KitEventType.DISCONNECT, () => {
+      setSession(null);
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem(STORAGE_KEY);
+      }
+    });
+
+    return () => {
+      offDisconnect();
+    };
+  }, []);
+
   const value = useMemo<WalletContextValue>(() => {
     return {
       session,
@@ -82,6 +113,7 @@ export function WalletProvider({
       errorMessage,
       clearWalletError: () => setErrorMessage(null),
       disconnectWallet: () => {
+        void StellarWalletsKit.disconnect().catch(() => undefined);
         setSession(null);
         setConnectionLabel(null);
 
@@ -99,7 +131,18 @@ export function WalletProvider({
             throw new Error('Wallet not installed');
           }
 
-          const address = await resolveMockAddress(walletId);
+          let address = '';
+
+          if (isTestWalletEnabled()) {
+            address = await resolveMockAddress(walletId);
+          } else {
+            StellarWalletsKit.setWallet(walletId);
+            const response = await StellarWalletsKit.getAddress().catch(async () => {
+              return StellarWalletsKit.fetchAddress();
+            });
+            address = response.address;
+          }
+
           const nextSession: WalletSession = { address, walletId };
           setSession(nextSession);
 

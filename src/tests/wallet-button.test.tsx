@@ -6,6 +6,7 @@ import { WalletProvider } from '@/hooks/use-wallet';
 describe('WalletButton', () => {
   it('connects and disconnects through the wallet modal', async () => {
     const user = userEvent.setup();
+    Object.assign(window, { __BACKLINE_TEST_WALLET__: true });
 
     render(
       <WalletProvider>
