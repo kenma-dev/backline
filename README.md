@@ -2,11 +2,7 @@
 
 Backline is a crowdfunding platform built on Stellar with a Next.js frontend and a Soroban smart contract. Creators can launch campaigns with funding goals and deadlines, supporters can back them with XLM, and campaigns follow clear claim and refund rules after the deadline.
 
-This repository contains the full app experience, the Soroban contract workspace, and the live testnet contract configuration currently used by the frontend.
-
-## Context
-
-This README includes the following sections — click any item to jump there:
+## Content
 
 - [Overview](#overview)
 - [Highlights](#highlights)
@@ -29,7 +25,6 @@ This README includes the following sections — click any item to jump there:
 - Frontend: Next.js, React, TypeScript, Tailwind CSS
 - Smart contract: Soroban Rust contract
 - Wallet support: Freighter
-- Package manager: `pnpm`
 
 ## Highlights
 
@@ -44,9 +39,9 @@ This README includes the following sections — click any item to jump there:
 
 ## Live links
 
-- Live website: `Add deployed URL here`
+- Live website: [backline-web.vercel.app](https://backline-web.vercel.app)
 
-- Demo video: `Add Loom or YouTube URL here`
+- Demo video: [Watch on Youtube](https://youtu.be/jTLjVX4klvo)
 
 - Contract on Stellar Lab:
   `https://lab.stellar.org/r/testnet/contract/CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX`
@@ -73,16 +68,23 @@ This README includes the following sections — click any item to jump there:
 
 ## Screenshots
 
-The README is ready for screenshots, but the image assets are not in the repo yet.
+### Hero Section
+![alt text](image.png)
 
-Add these when available:
+### Campaign Listing
+![alt text](image-1.png)
 
-- Wallet connected state
-- Campaign list page
-- Campaign detail transaction success state
-- Dashboard page
-- Passing test results screenshot
+### Detailed Campaign page
+![alt text](image-2.png)
 
+### Dashboard
+![alt text](image-3.png)
+
+### Create Campaign
+![alt text](image-4.png)
+
+### Test Cases Passed(3)
+![alt text](image-5.png)
 
 ## Features
 
