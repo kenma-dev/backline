@@ -6,6 +6,8 @@ import { useCampaign } from '@/hooks/use-campaign';
 import { useWallet } from '@/hooks/use-wallet';
 import { useBackCampaign } from '@/hooks/use-back-campaign';
 import { useBalance } from '@/hooks/use-balance';
+import { useClaimFunds } from '@/hooks/use-claim-funds';
+import { useRefundCampaign } from '@/hooks/use-refund-campaign';
 import { CachedAt } from '@/components/cached-at';
 import { LoadingSpinner } from '@/components/loading-spinner';
 import { ProgressBar } from '@/components/progress-bar';
@@ -20,6 +22,8 @@ export default function CampaignDetailsPage(): JSX.Element {
   const { session } = useWallet();
   const balanceQuery = useBalance(session?.address ?? null);
   const backMutation = useBackCampaign(session?.address ?? null);
+  const claimMutation = useClaimFunds();
+  const refundMutation = useRefundCampaign(session?.address ?? null);
   const [amount, setAmount] = useState('25');
   const [txState, setTxState] = useState<TransactionState>({ status: 'idle' });
 
@@ -53,6 +57,14 @@ export default function CampaignDetailsPage(): JSX.Element {
 
   const campaign = campaignQuery.data;
   const status = getCampaignStatus(campaign);
+  const isCreator = session?.address === campaign.creator;
+  const deadlinePassed = new Date(campaign.deadline).getTime() <= Date.now();
+  const canClaim = isCreator && deadlinePassed && campaign.raised >= campaign.goal && !campaign.claimed;
+  const canRefund =
+    Boolean(session?.address) &&
+    deadlinePassed &&
+    campaign.raised < campaign.goal &&
+    campaign.backers.some((backer) => backer.address === session?.address);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
@@ -225,6 +237,68 @@ export default function CampaignDetailsPage(): JSX.Element {
         <div className="mt-5">
           <TransactionStatus state={txState} />
         </div>
+        {(canClaim || canRefund) && (
+          <div className="mt-5 space-y-3">
+            {canClaim ? (
+              <button
+                type="button"
+                onClick={async () => {
+                  setTxState({
+                    status: 'pending',
+                    message: 'Processing transaction...',
+                  });
+
+                  try {
+                    const result = await claimMutation.mutateAsync(campaign.id);
+                    setTxState({
+                      status: 'success',
+                      message: `Funds claimed in ${result.mode} mode.`,
+                      hash: result.hash,
+                    });
+                  } catch (error) {
+                    setTxState({
+                      status: 'error',
+                      message: error instanceof Error ? error.message : 'Unable to claim funds.',
+                    });
+                  }
+                }}
+                disabled={claimMutation.isPending}
+                className="inline-flex w-full items-center justify-center rounded-full border border-pine/25 bg-pine/10 px-5 py-3 text-sm font-semibold text-pine transition hover:bg-pine/15 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {claimMutation.isPending ? 'Processing transaction...' : 'Claim Funds'}
+              </button>
+            ) : null}
+            {canRefund ? (
+              <button
+                type="button"
+                onClick={async () => {
+                  setTxState({
+                    status: 'pending',
+                    message: 'Processing transaction...',
+                  });
+
+                  try {
+                    const result = await refundMutation.mutateAsync(campaign.id);
+                    setTxState({
+                      status: 'success',
+                      message: `Refund processed in ${result.mode} mode.`,
+                      hash: result.hash,
+                    });
+                  } catch (error) {
+                    setTxState({
+                      status: 'error',
+                      message: error instanceof Error ? error.message : 'Unable to process refund.',
+                    });
+                  }
+                }}
+                disabled={refundMutation.isPending}
+                className="inline-flex w-full items-center justify-center rounded-full border border-ink/15 bg-white px-5 py-3 text-sm font-semibold text-ink transition hover:border-ink/30 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {refundMutation.isPending ? 'Processing transaction...' : 'Request Refund'}
+              </button>
+            ) : null}
+          </div>
+        )}
       </aside>
     </div>
   );

@@ -1,4 +1,10 @@
-import { createDemoCampaign, backDemoCampaign, readCampaigns } from '@/lib/demo-store';
+import {
+  backDemoCampaign,
+  claimDemoCampaign,
+  createDemoCampaign,
+  readCampaigns,
+  refundDemoCampaign,
+} from '@/lib/demo-store';
 import { env } from '@/lib/env';
 import type { Campaign, CampaignFormValues } from '@/types';
 
@@ -60,7 +66,7 @@ export async function backCampaign(
 
 export async function claimCampaignFunds(
   campaignId: number,
-): Promise<{ hash: string }> {
+): Promise<{ campaign: Campaign; hash: string; mode: 'contract' | 'demo' }> {
   const campaign = await getCampaign(campaignId);
 
   if (new Date(campaign.deadline).getTime() > Date.now()) {
@@ -71,12 +77,17 @@ export async function claimCampaignFunds(
     throw new Error('Campaign goal has not been met.');
   }
 
-  return { hash: createMockHash('claim') };
+  return {
+    campaign: claimDemoCampaign(campaignId),
+    hash: createMockHash('claim'),
+    mode: 'demo',
+  };
 }
 
 export async function refundCampaignContribution(
   campaignId: number,
-): Promise<{ hash: string }> {
+  address: string,
+): Promise<{ campaign: Campaign; hash: string; mode: 'contract' | 'demo' }> {
   const campaign = await getCampaign(campaignId);
 
   if (new Date(campaign.deadline).getTime() > Date.now()) {
@@ -87,5 +98,9 @@ export async function refundCampaignContribution(
     throw new Error('Refunds are unavailable because the campaign met its goal.');
   }
 
-  return { hash: createMockHash('refund') };
+  return {
+    campaign: refundDemoCampaign(campaignId, address),
+    hash: createMockHash('refund'),
+    mode: 'demo',
+  };
 }

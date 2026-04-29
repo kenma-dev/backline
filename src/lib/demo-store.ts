@@ -153,3 +153,49 @@ export function backDemoCampaign(
 
   return match;
 }
+
+export function claimDemoCampaign(campaignId: number): Campaign {
+  const campaigns = readCampaigns();
+  const updated = campaigns.map((campaign) => {
+    if (campaign.id !== campaignId) {
+      return campaign;
+    }
+
+    return {
+      ...campaign,
+      claimed: true,
+    };
+  });
+
+  writeCampaigns(updated);
+  const match = updated.find((item) => item.id === campaignId);
+
+  if (!match) {
+    throw new Error('Campaign not found');
+  }
+
+  return match;
+}
+
+export function refundDemoCampaign(campaignId: number, address: string): Campaign {
+  const campaigns = readCampaigns();
+  const updated = campaigns.map((campaign) => {
+    if (campaign.id !== campaignId) {
+      return campaign;
+    }
+
+    return {
+      ...campaign,
+      backers: campaign.backers.filter((backer) => backer.address !== address),
+    };
+  });
+
+  writeCampaigns(updated);
+  const match = updated.find((item) => item.id === campaignId);
+
+  if (!match) {
+    throw new Error('Campaign not found');
+  }
+
+  return match;
+}
