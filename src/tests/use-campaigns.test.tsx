@@ -1,3 +1,4 @@
+import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import { useCampaigns } from '@/hooks/use-campaigns';
 import { renderWithQueryClient } from '@/tests/test-utils';

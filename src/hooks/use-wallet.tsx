@@ -1,6 +1,5 @@
 'use client';
 
-import { KitEventType, Networks, StellarWalletsKit } from '@creit.tech/stellar-wallets-kit';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { WalletId, WalletSession } from '@/types';
 
@@ -24,16 +23,29 @@ async function resolveMockAddress(walletId: WalletId): Promise<string> {
   return `${prefix}${'1'.repeat(47 - prefix.length)}`;
 }
 
+async function loadWalletKit() {
+  const [{ StellarWalletsKit }, { Networks, KitEventType }, { defaultModules }] =
+    await Promise.all([
+      import('@creit.tech/stellar-wallets-kit/sdk'),
+      import('@creit.tech/stellar-wallets-kit/types'),
+      import('@creit.tech/stellar-wallets-kit/modules/utils'),
+    ]);
+
+  return { StellarWalletsKit, Networks, KitEventType, defaultModules };
+}
+
 function isTestWalletEnabled(): boolean {
   if (typeof window === 'undefined') {
     return false;
   }
 
-  return Boolean(Reflect.get(window as Record<string, unknown>, TEST_WALLET_KEY));
+  return Boolean(Reflect.get(window as unknown as Record<string, unknown>, TEST_WALLET_KEY));
 }
 
-function initWalletKit(): void {
+async function initWalletKit(): Promise<void> {
+  const { StellarWalletsKit, Networks, defaultModules } = await loadWalletKit();
   StellarWalletsKit.init({
+    modules: defaultModules(),
     network: Networks.TESTNET,
   });
 }
@@ -43,7 +55,7 @@ function getWindowValue(key: string): unknown {
     return undefined;
   }
 
-  return Reflect.get(window as Record<string, unknown>, key);
+  return Reflect.get(window as unknown as Record<string, unknown>, key);
 }
 
 function isWalletInstalled(walletId: WalletId): boolean {
@@ -73,7 +85,7 @@ export function WalletProvider({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    initWalletKit();
+    void initWalletKit();
 
     if (typeof window === 'undefined') {
       return;
@@ -93,11 +105,15 @@ export function WalletProvider({
   }, []);
 
   useEffect(() => {
-    const offDisconnect = StellarWalletsKit.on(KitEventType.DISCONNECT, () => {
-      setSession(null);
-      if (typeof window !== 'undefined') {
-        window.localStorage.removeItem(STORAGE_KEY);
-      }
+    let offDisconnect = () => undefined;
+
+    void loadWalletKit().then(({ StellarWalletsKit, KitEventType }) => {
+      offDisconnect = StellarWalletsKit.on(KitEventType.DISCONNECT, () => {
+        setSession(null);
+        if (typeof window !== 'undefined') {
+          window.localStorage.removeItem(STORAGE_KEY);
+        }
+      });
     });
 
     return () => {
@@ -113,7 +129,9 @@ export function WalletProvider({
       errorMessage,
       clearWalletError: () => setErrorMessage(null),
       disconnectWallet: () => {
-        void StellarWalletsKit.disconnect().catch(() => undefined);
+        void loadWalletKit()
+          .then(({ StellarWalletsKit }) => StellarWalletsKit.disconnect())
+          .catch(() => undefined);
         setSession(null);
         setConnectionLabel(null);
 
@@ -136,6 +154,7 @@ export function WalletProvider({
           if (isTestWalletEnabled()) {
             address = await resolveMockAddress(walletId);
           } else {
+            const { StellarWalletsKit } = await loadWalletKit();
             StellarWalletsKit.setWallet(walletId);
             const response = await StellarWalletsKit.getAddress().catch(async () => {
               return StellarWalletsKit.fetchAddress();
