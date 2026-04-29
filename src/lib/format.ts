@@ -57,6 +57,18 @@ export function getUserContribution(campaign: Campaign, address: string | null):
   }, 0);
 }
 
+export function matchesCampaignSearch(campaign: Campaign, searchTerm: string): boolean {
+  const normalized = searchTerm.trim().toLowerCase();
+
+  if (!normalized) {
+    return true;
+  }
+
+  return [campaign.title, campaign.description, campaign.creator].some((field) =>
+    field.toLowerCase().includes(normalized),
+  );
+}
+
 export function getCampaignStatus(campaign: Campaign): 'active' | 'funded' | 'ended' {
   const isEnded = new Date(campaign.deadline).getTime() <= Date.now();
 

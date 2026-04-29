@@ -1,4 +1,5 @@
 import { CampaignGrid } from '@/components/campaign-grid';
+import { ConnectedOverview } from '@/components/connected-overview';
 import { Hero } from '@/components/hero';
 import { HomeHighlights } from '@/components/home-highlights';
 import { RecentActivity } from '@/components/recent-activity';
@@ -7,6 +8,7 @@ export default function HomePage(): JSX.Element {
   return (
     <div className="space-y-10">
       <Hero />
+      <ConnectedOverview />
       <HomeHighlights />
       <section className="space-y-5">
         <div className="flex items-end justify-between gap-4">

@@ -5,15 +5,19 @@ import { CampaignCard } from '@/components/campaign-card';
 import { CachedAt } from '@/components/cached-at';
 import { LoadingSpinner } from '@/components/loading-spinner';
 import { useCampaigns } from '@/hooks/use-campaigns';
-import { getCampaignStatus } from '@/lib/format';
+import { getCampaignStatus, matchesCampaignSearch } from '@/lib/format';
 import type { CampaignStatus } from '@/types';
 
 export function CampaignGrid({
   featured = false,
   filter = 'all',
+  searchTerm = '',
+  sortBy = 'deadline',
 }: {
   featured?: boolean;
   filter?: 'all' | CampaignStatus;
+  searchTerm?: string;
+  sortBy?: 'deadline' | 'raised' | 'goal' | 'backers';
 }): JSX.Element {
   const campaignsQuery = useCampaigns();
 
@@ -38,12 +42,27 @@ export function CampaignGrid({
   const campaigns = campaignsQuery.data ?? [];
   const filtered = campaigns.filter((campaign) => {
     if (filter === 'all') {
-      return true;
+      return matchesCampaignSearch(campaign, searchTerm);
     }
 
-    return getCampaignStatus(campaign) === filter;
+    return getCampaignStatus(campaign) === filter && matchesCampaignSearch(campaign, searchTerm);
   });
-  const visible = featured ? filtered.slice(0, 3) : filtered;
+  const sorted = [...filtered].sort((left, right) => {
+    if (sortBy === 'raised') {
+      return right.raised - left.raised;
+    }
+
+    if (sortBy === 'goal') {
+      return right.goal - left.goal;
+    }
+
+    if (sortBy === 'backers') {
+      return right.backers.length - left.backers.length;
+    }
+
+    return new Date(left.deadline).getTime() - new Date(right.deadline).getTime();
+  });
+  const visible = featured ? sorted.slice(0, 3) : sorted;
 
   return (
     <div>

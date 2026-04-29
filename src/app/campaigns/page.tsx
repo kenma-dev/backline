@@ -16,6 +16,8 @@ const filters: Array<{ label: string; value: 'all' | CampaignStatus }> = [
 
 export default function CampaignsPage(): JSX.Element {
   const [filter, setFilter] = useState<'all' | CampaignStatus>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<'deadline' | 'raised' | 'goal' | 'backers'>('deadline');
   const { session } = useWallet();
 
   return (
@@ -56,9 +58,35 @@ export default function CampaignsPage(): JSX.Element {
             </button>
           ))}
         </div>
+        <div className="mt-6 grid gap-4 md:grid-cols-[1fr_220px]">
+          <label className="block">
+            <span className="text-sm font-semibold text-ink">Search campaigns</span>
+            <input
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Search by title, description, or creator"
+              className="mt-2 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-ember"
+            />
+          </label>
+          <label className="block">
+            <span className="text-sm font-semibold text-ink">Sort by</span>
+            <select
+              value={sortBy}
+              onChange={(event) =>
+                setSortBy(event.target.value as 'deadline' | 'raised' | 'goal' | 'backers')
+              }
+              className="mt-2 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-ember"
+            >
+              <option value="deadline">Nearest deadline</option>
+              <option value="raised">Most raised</option>
+              <option value="goal">Highest goal</option>
+              <option value="backers">Most backers</option>
+            </select>
+          </label>
+        </div>
       </section>
       <AppModePanel />
-      <CampaignGrid filter={filter} />
+      <CampaignGrid filter={filter} searchTerm={searchTerm} sortBy={sortBy} />
     </div>
   );
 }

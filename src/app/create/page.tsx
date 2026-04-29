@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppModePanel } from '@/components/app-mode-panel';
@@ -17,6 +18,7 @@ const initialValues: CampaignFormValues = {
   goal: 0,
   deadline: '',
 };
+const DRAFT_KEY = 'backline:create-campaign-draft';
 
 export default function CreateCampaignPage(): JSX.Element {
   const router = useRouter();
@@ -24,6 +26,31 @@ export default function CreateCampaignPage(): JSX.Element {
   const createMutation = useCreateCampaign(session?.address ?? null);
   const [values, setValues] = useState<CampaignFormValues>(initialValues);
   const [txState, setTxState] = useState<TransactionState>({ status: 'idle' });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const stored = window.localStorage.getItem(DRAFT_KEY);
+    if (!stored) {
+      return;
+    }
+
+    try {
+      setValues(JSON.parse(stored) as CampaignFormValues);
+    } catch {
+      window.localStorage.removeItem(DRAFT_KEY);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.localStorage.setItem(DRAFT_KEY, JSON.stringify(values));
+  }, [values]);
 
   return (
     <div className="space-y-8">
@@ -77,6 +104,10 @@ export default function CreateCampaignPage(): JSX.Element {
 
               try {
                 const result = await createMutation.mutateAsync(values);
+                if (typeof window !== 'undefined') {
+                  window.localStorage.removeItem(DRAFT_KEY);
+                }
+                setValues(initialValues);
                 setTxState({
                   status: 'success',
                   message: 'Campaign created successfully.',
@@ -168,6 +199,21 @@ export default function CreateCampaignPage(): JSX.Element {
           </form>
           <div className="mt-6">
             <TransactionStatus state={txState} />
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-ink/55">
+            <span>Draft auto-saves in this browser.</span>
+            <button
+              type="button"
+              onClick={() => {
+                setValues(initialValues);
+                if (typeof window !== 'undefined') {
+                  window.localStorage.removeItem(DRAFT_KEY);
+                }
+              }}
+              className="rounded-full border border-ink/10 bg-white/80 px-4 py-2 font-semibold text-ink transition hover:border-ink/30"
+            >
+              Clear draft
+            </button>
           </div>
         </section>
         <CreateCampaignPreview values={values} />
