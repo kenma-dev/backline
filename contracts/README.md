@@ -18,3 +18,9 @@ This workspace contains the `crowdfund` Soroban contract for Backline.
 2. Compile the contract to wasm.
 3. Deploy with `stellar contract deploy --network testnet ...`
 4. Save the deployed contract id in `NEXT_PUBLIC_CONTRACT_ID`.
+
+## Live Testnet Deployment
+
+- Contract ID: `CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX`
+- Deploy transaction:
+  `https://stellar.expert/explorer/testnet/tx/d9ee7961280a9ac8df7ec633e0534e108b47b29dbae542ee70697f80a4b50e19`

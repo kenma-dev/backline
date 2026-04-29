@@ -13,12 +13,11 @@ Implemented so far:
 - Cached balance and campaign hooks
 - Transaction status UI and loading states
 - Soroban crowdfund contract workspace with Rust tests
-- Claim and refund actions in the frontend demo flow
+- Claim and refund actions in the frontend live contract flow
+- Live testnet contract deployment with seeded on-chain campaigns
 
 Still pending before the full three-level submission is complete:
-- Clean `pnpm` install and lockfile generation in this environment
-- Full live wallet transaction integration against testnet
-- Testnet contract deployment and real contract ID wiring
+- Browser-side QA across Freighter, Albedo, and xBull against the live contract
 - Final screenshots, demo video, and hosted deployment links
 
 ## Features
@@ -49,15 +48,12 @@ Still pending before the full three-level submission is complete:
 Copy `.env.example` to `.env` and fill in values as needed:
 
 ```bash
-VITE_NETWORK=testnet
-VITE_CONTRACT_ID=
-VITE_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
-VITE_HORIZON_URL=https://horizon-testnet.stellar.org
-VITE_STELLAR_EXPERT_URL=https://stellar.expert/explorer/testnet
+NEXT_PUBLIC_NETWORK=testnet
+NEXT_PUBLIC_CONTRACT_ID=CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX
+NEXT_PUBLIC_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+NEXT_PUBLIC_HORIZON_URL=https://horizon-testnet.stellar.org
+NEXT_PUBLIC_STELLAR_EXPERT_URL=https://stellar.expert/explorer/testnet
 ```
-
-Note:
-- the frontend has been migrated to Next.js, so these should be renamed to `NEXT_PUBLIC_*` before final deployment wiring.
 
 ## Local Development
 
@@ -96,19 +92,33 @@ pnpm contract:build
 The Soroban workspace lives in [contracts/crowdfund](/home/pk/Documents/Stellar/project-1/contracts/crowdfund).
 
 Current contract surface:
+- `get_campaign_count`
 - `create_campaign`
 - `back_campaign`
 - `get_campaign`
 - `get_total_raised`
 - `get_backers_count`
+- `get_backers`
 - `claim_funds`
 - `refund`
+
+## Live Testnet State
+
+- Contract ID: `CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX`
+- Deployer address: `GDCDJTGUX4YWLQ3V4YPQLX7FNEIP2EZ3NJKSNSB64FGGBOOHKBKNXIYR`
+- Backer address: `GCHU2DEMMEP4HQ7H7ARW4DGTOZRAXNZEOBDA6N77XU4XOK3JD5SBDG2U`
+- Deploy transaction:
+  `https://stellar.expert/explorer/testnet/tx/d9ee7961280a9ac8df7ec633e0534e108b47b29dbae542ee70697f80a4b50e19`
+- Seeded campaigns:
+  `1` `Backline Testnet Showcase` with `25.00 XLM` raised
+  `2` `Backline Refund Test` expired before backing and remains empty
+  `3` `Backline Refund Window` was backed with `5.00 XLM` and later refunded to `0.00 XLM`
 
 ## Submission Placeholders
 
 These need to be filled in before final delivery:
 
-- Contract address: `TBD`
+- Contract address: `CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX`
 - Live demo link: `TBD`
 - Demo video link: `TBD`
 - Wallet screenshot: `TBD`

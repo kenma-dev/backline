@@ -1,7 +1,7 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, Address, Env, String, Symbol, Vec,
+    contract, contracterror, contractimpl, contracttype, Address, Env, String, Symbol, Vec
 };
 
 #[contract]
@@ -48,7 +48,7 @@ pub enum DataKey {
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[repr(u32)]
-#[contracttype]
+#[contracterror]
 pub enum ContractError {
     InvalidGoal = 1,
     InvalidDeadline = 2,
