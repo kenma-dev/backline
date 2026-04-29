@@ -47,6 +47,24 @@ export function formatCountdownLabel(deadline: string): string {
   return `${getDaysRemaining(deadline)} days left`;
 }
 
+export function getCampaignStateSummary(campaign: Campaign): string {
+  const status = getCampaignStatus(campaign);
+
+  if (status === 'active') {
+    return 'Campaign is live and still accepting support.';
+  }
+
+  if (status === 'funded' && !campaign.claimed) {
+    return 'Goal reached. Funds can be claimed after the deadline.';
+  }
+
+  if (status === 'funded' && campaign.claimed) {
+    return 'Goal reached and funds already claimed by the creator.';
+  }
+
+  return 'Campaign ended without reaching its goal. Eligible backers can request refunds.';
+}
+
 export function getUserContribution(campaign: Campaign, address: string | null): number {
   if (!address) {
     return 0;

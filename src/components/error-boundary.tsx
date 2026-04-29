@@ -18,6 +18,12 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true };
   }
 
+  private handleReload = (): void => {
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
+  };
+
   override componentDidCatch(_error: Error, _errorInfo: ErrorInfo): void {}
 
   override render(): ReactNode {
@@ -34,6 +40,13 @@ export class ErrorBoundary extends Component<Props, State> {
             <p className="mt-4 text-sm leading-6 text-ink/70">
               Refresh the page and try again. If the issue persists, reconnect your wallet and retry the action.
             </p>
+            <button
+              type="button"
+              onClick={this.handleReload}
+              className="mt-6 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90"
+            >
+              Reload Backline
+            </button>
           </div>
         </div>
       );

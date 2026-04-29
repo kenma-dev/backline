@@ -9,7 +9,9 @@ import { useBalance } from '@/hooks/use-balance';
 import { useClaimFunds } from '@/hooks/use-claim-funds';
 import { useRefundCampaign } from '@/hooks/use-refund-campaign';
 import { CachedAt } from '@/components/cached-at';
+import { CampaignActionsPanel } from '@/components/campaign-actions-panel';
 import { CampaignRolePanel } from '@/components/campaign-role-panel';
+import { CampaignStateBanner } from '@/components/campaign-state-banner';
 import { LoadingSpinner } from '@/components/loading-spinner';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import { ProgressBar } from '@/components/progress-bar';
@@ -69,6 +71,8 @@ export default function CampaignDetailsPage(): JSX.Element {
   const isCreator = session?.address === campaign.creator;
   const deadlinePassed = new Date(campaign.deadline).getTime() <= Date.now();
   const contribution = getUserContribution(campaign, session?.address ?? null);
+  const goalMet = campaign.raised >= campaign.goal;
+  const canBack = !deadlinePassed;
   const canClaim = isCreator && deadlinePassed && campaign.raised >= campaign.goal && !campaign.claimed;
   const canRefund =
     Boolean(session?.address) &&
@@ -87,6 +91,7 @@ export default function CampaignDetailsPage(): JSX.Element {
         </div>
         <h1 className="mt-5 font-display text-4xl text-ink">{campaign.title}</h1>
         <p className="mt-4 max-w-3xl text-base leading-8 text-ink/72">{campaign.description}</p>
+        <CampaignStateBanner campaign={campaign} status={status} />
         <div className="mt-8">
           <ProgressBar raised={campaign.raised} goal={campaign.goal} large />
         </div>
@@ -125,6 +130,7 @@ export default function CampaignDetailsPage(): JSX.Element {
           canClaim={canClaim}
           canRefund={canRefund}
           deadline={campaign.deadline}
+          claimed={campaign.claimed}
         />
         <div className="mt-10">
           <h2 className="font-display text-2xl text-ink">Recent backers</h2>
@@ -162,6 +168,15 @@ export default function CampaignDetailsPage(): JSX.Element {
         <p className="mt-3 text-sm leading-7 text-ink/68">
           Connect your wallet, enter an amount, and confirm the backing transaction.
         </p>
+        <CampaignActionsPanel
+          showConnectHint={!session?.address}
+          canBack={canBack}
+          canClaim={canClaim}
+          canRefund={canRefund}
+          isCreator={Boolean(isCreator)}
+          deadlinePassed={deadlinePassed}
+          goalMet={goalMet}
+        />
         <label className="mt-6 block text-sm font-semibold text-ink" htmlFor="amount">
           Amount in XLM
         </label>
@@ -250,10 +265,14 @@ export default function CampaignDetailsPage(): JSX.Element {
               });
             }
           }}
-          disabled={backMutation.isPending}
+          disabled={backMutation.isPending || !canBack}
           className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {backMutation.isPending ? 'Processing transaction...' : 'Back This Campaign'}
+          {backMutation.isPending
+            ? 'Processing transaction...'
+            : !canBack
+              ? 'Campaign Closed'
+              : 'Back This Campaign'}
         </button>
         <div className="mt-5">
           <TransactionStatus state={txState} />

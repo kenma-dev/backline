@@ -7,6 +7,7 @@ interface CampaignRolePanelProps {
   canClaim: boolean;
   canRefund: boolean;
   deadline: string;
+  claimed: boolean;
 }
 
 export function CampaignRolePanel({
@@ -16,6 +17,7 @@ export function CampaignRolePanel({
   canClaim,
   canRefund,
   deadline,
+  claimed,
 }: CampaignRolePanelProps): JSX.Element {
   return (
     <div className="mt-6 rounded-[28px] border border-white/70 bg-white/70 p-5">
@@ -40,6 +42,11 @@ export function CampaignRolePanel({
           : 'Claim and refund actions unlock once the deadline passes.'}
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
+        {claimed ? (
+          <span className="rounded-full bg-pine/12 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-pine">
+            Funds claimed
+          </span>
+        ) : null}
         {canClaim ? (
           <span className="rounded-full bg-pine/15 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-pine">
             Claim available
