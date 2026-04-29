@@ -12,15 +12,17 @@ import { CachedAt } from '@/components/cached-at';
 import { CampaignActionsPanel } from '@/components/campaign-actions-panel';
 import { CampaignRolePanel } from '@/components/campaign-role-panel';
 import { CampaignStateBanner } from '@/components/campaign-state-banner';
+import { LiveCountdown } from '@/components/live-countdown';
 import { LoadingSpinner } from '@/components/loading-spinner';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import { ProgressBar } from '@/components/progress-bar';
+import { SupportSuggestions } from '@/components/support-suggestions';
 import { TransactionStatus } from '@/components/transaction-status';
 import {
   formatDeadline,
   formatXlm,
   getCampaignStatus,
-  getDaysRemaining,
+  getRemainingToGoal,
   getUserContribution,
   truncateAddress,
 } from '@/lib/format';
@@ -72,6 +74,7 @@ export default function CampaignDetailsPage(): JSX.Element {
   const deadlinePassed = new Date(campaign.deadline).getTime() <= Date.now();
   const contribution = getUserContribution(campaign, session?.address ?? null);
   const goalMet = campaign.raised >= campaign.goal;
+  const remainingToGoal = getRemainingToGoal(campaign);
   const canBack = !deadlinePassed;
   const canClaim = isCreator && deadlinePassed && campaign.raised >= campaign.goal && !campaign.claimed;
   const canRefund =
@@ -120,7 +123,13 @@ export default function CampaignDetailsPage(): JSX.Element {
           </div>
           <div>
             <dt className="text-sm text-ink/45">Countdown</dt>
-            <dd className="mt-2 font-semibold text-ink">{getDaysRemaining(campaign.deadline)} days</dd>
+            <dd className="mt-2 font-semibold text-ink">
+              <LiveCountdown deadline={campaign.deadline} />
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm text-ink/45">Remaining</dt>
+            <dd className="mt-2 font-semibold text-ink">{formatXlm(remainingToGoal)}</dd>
           </div>
         </dl>
         <CampaignRolePanel
@@ -199,6 +208,12 @@ export default function CampaignDetailsPage(): JSX.Element {
             <p className="mt-2 font-display text-2xl text-ink">{formatXlm(balanceQuery.data ?? 0)}</p>
           )}
         </div>
+        {canBack ? (
+          <SupportSuggestions
+            remaining={remainingToGoal}
+            onSelect={(value) => setAmount(String(value))}
+          />
+        ) : null}
         {insufficientLabel ? (
           <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {insufficientLabel}

@@ -87,6 +87,10 @@ export function matchesCampaignSearch(campaign: Campaign, searchTerm: string): b
   );
 }
 
+export function getRemainingToGoal(campaign: Campaign): number {
+  return Math.max(0, campaign.goal - campaign.raised);
+}
+
 export function getCampaignStatus(campaign: Campaign): 'active' | 'funded' | 'ended' {
   const isEnded = new Date(campaign.deadline).getTime() <= Date.now();
 
