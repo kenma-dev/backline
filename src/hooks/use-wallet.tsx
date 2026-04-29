@@ -87,6 +87,10 @@ export function WalletProvider({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isTestWalletEnabled()) {
+      return;
+    }
+
     void initWalletKit();
 
     if (typeof window === 'undefined') {
@@ -109,7 +113,11 @@ export function WalletProvider({
   }, []);
 
   useEffect(() => {
-    let offDisconnect = () => undefined;
+    if (isTestWalletEnabled()) {
+      return;
+    }
+
+    let offDisconnect: () => void = () => {};
 
     void loadWalletKit().then(({ StellarWalletsKit, KitEventType }) => {
       offDisconnect = StellarWalletsKit.on(KitEventType.DISCONNECT, () => {
