@@ -72,6 +72,12 @@ export function ConnectedOverview(): JSX.Element | null {
         >
           Review campaigns
         </Link>
+        <Link
+          href="/dashboard"
+          className="rounded-full border border-ink/10 bg-white/80 px-5 py-3 text-sm font-semibold text-ink transition hover:border-ink/30"
+        >
+          Open dashboard
+        </Link>
       </div>
     </section>
   );

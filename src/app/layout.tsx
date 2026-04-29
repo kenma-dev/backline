@@ -22,7 +22,7 @@ export default function RootLayout({
           <ErrorBoundary>
             <div className="min-h-screen">
               <Navbar />
-              <main className="mx-auto flex w-full max-w-7xl flex-col px-4 pb-20 pt-6 sm:px-6 lg:px-8">
+              <main id="top" className="mx-auto flex w-full max-w-7xl flex-col px-4 pb-20 pt-6 sm:px-6 lg:px-8">
                 {children}
               </main>
             </div>

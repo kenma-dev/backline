@@ -23,6 +23,7 @@ export function Navbar(): JSX.Element {
           <nav className="hidden items-center gap-4 text-sm font-semibold text-ink/70 md:flex">
             <Link href="/campaigns">Campaigns</Link>
             <Link href="/create">Create</Link>
+            {session ? <Link href="/dashboard">Dashboard</Link> : null}
           </nav>
         </div>
         <div className="flex items-center gap-3">
@@ -43,6 +44,14 @@ export function Navbar(): JSX.Element {
         >
           Create
         </Link>
+        {session ? (
+          <Link
+            href="/dashboard"
+            className="rounded-full border border-ink/10 bg-white/75 px-4 py-2 text-sm font-semibold text-ink"
+          >
+            Dashboard
+          </Link>
+        ) : null}
       </div>
     </header>
   );

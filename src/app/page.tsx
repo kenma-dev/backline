@@ -48,6 +48,14 @@ export default function HomePage(): JSX.Element {
             </p>
           </div>
         </div>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <a
+            href="#top"
+            className="rounded-full border border-ink/10 bg-white/80 px-5 py-3 text-sm font-semibold text-ink transition hover:border-ink/30"
+          >
+            Back to top
+          </a>
+        </div>
       </section>
     </div>
   );
