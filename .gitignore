@@ -3,3 +3,6 @@ node_modules
 dist
 coverage
 *.log
+target
+.next
+pnpm-lock.yaml
