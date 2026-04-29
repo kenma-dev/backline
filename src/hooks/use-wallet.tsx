@@ -13,7 +13,7 @@ interface WalletContextValue {
   isConnecting: boolean;
   connectionLabel: string | null;
   errorMessage: string | null;
-  connectWallet: (walletId: WalletId) => Promise<void>;
+  connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   clearWalletError: () => void;
   signTransaction: (xdr: string, address?: string) => Promise<string>;
@@ -21,20 +21,33 @@ interface WalletContextValue {
 
 const WalletContext = createContext<WalletContextValue | undefined>(undefined);
 
-async function resolveMockAddress(walletId: WalletId): Promise<string> {
-  const prefix = walletId === 'freighter' ? 'GFREIGHTER' : walletId === 'albedo' ? 'GALBEDO' : 'GXBULL';
-  return `${prefix}${'1'.repeat(47 - prefix.length)}`;
+interface FreighterResponseWithError {
+  error?: string | { message?: string };
 }
 
-async function loadWalletKit() {
-  const [{ StellarWalletsKit }, { Networks, KitEventType }, { defaultModules }] =
-    await Promise.all([
-      import('@creit.tech/stellar-wallets-kit/sdk'),
-      import('@creit.tech/stellar-wallets-kit/types'),
-      import('@creit.tech/stellar-wallets-kit/modules/utils'),
-    ]);
+interface FreighterAddressResponse extends FreighterResponseWithError {
+  address: string;
+}
 
-  return { StellarWalletsKit, Networks, KitEventType, defaultModules };
+interface FreighterSignTransactionResponse extends FreighterResponseWithError {
+  signedTxXdr: string;
+  signerAddress?: string;
+}
+
+interface FreighterApi {
+  getAddress: () => Promise<FreighterAddressResponse>;
+  requestAccess: () => Promise<FreighterAddressResponse>;
+  signTransaction: (
+    xdr: string,
+    opts?: {
+      networkPassphrase?: string;
+      address?: string;
+    },
+  ) => Promise<FreighterSignTransactionResponse>;
+}
+
+async function resolveMockAddress(): Promise<string> {
+  return `GFREIGHTER${'1'.repeat(37)}`;
 }
 
 function isTestWalletEnabled(): boolean {
@@ -45,36 +58,44 @@ function isTestWalletEnabled(): boolean {
   return Boolean(Reflect.get(window as unknown as Record<string, unknown>, TEST_WALLET_KEY));
 }
 
-async function initWalletKit(): Promise<void> {
-  const { StellarWalletsKit, Networks, defaultModules } = await loadWalletKit();
-  StellarWalletsKit.init({
-    modules: defaultModules(),
-    network: Networks.TESTNET,
-  });
+async function loadFreighterApi(): Promise<FreighterApi> {
+  const freighterApi = await import('@stellar/freighter-api');
+
+  return {
+    getAddress: freighterApi.getAddress,
+    requestAccess: freighterApi.requestAccess,
+    signTransaction: freighterApi.signTransaction,
+  };
 }
 
-function getWindowValue(key: string): unknown {
-  if (typeof window === 'undefined') {
-    return undefined;
+function getFreighterErrorMessage(error: unknown): string {
+  if (typeof error === 'string') {
+    return error;
   }
 
-  return Reflect.get(window as unknown as Record<string, unknown>, key);
-}
-
-function isWalletInstalled(walletId: WalletId): boolean {
-  if (typeof window === 'undefined') {
-    return false;
+  if (error && typeof error === 'object' && 'message' in error) {
+    const message = Reflect.get(error, 'message');
+    if (typeof message === 'string') {
+      return message;
+    }
   }
 
-  if (walletId === 'freighter') {
-    return typeof getWindowValue('freighterApi') !== 'undefined';
+  if (error && typeof error === 'object' && 'error' in error) {
+    const nested = Reflect.get(error, 'error');
+
+    if (typeof nested === 'string') {
+      return nested;
+    }
+
+    if (nested && typeof nested === 'object' && 'message' in nested) {
+      const nestedMessage = Reflect.get(nested, 'message');
+      if (typeof nestedMessage === 'string') {
+        return nestedMessage;
+      }
+    }
   }
 
-  if (walletId === 'xbull') {
-    return typeof getWindowValue('xbull') !== 'undefined';
-  }
-
-  return true;
+  return 'Unable to complete the Freighter request right now.';
 }
 
 export function WalletProvider({
@@ -89,12 +110,6 @@ export function WalletProvider({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isTestWalletEnabled()) {
-      return;
-    }
-
-    void initWalletKit();
-
     if (typeof window === 'undefined') {
       return;
     }
@@ -107,32 +122,33 @@ export function WalletProvider({
 
     try {
       const parsed = JSON.parse(stored) as WalletSession;
-      setSession(parsed);
       setLastWalletId(parsed.walletId);
+
+      if (isTestWalletEnabled()) {
+        setSession(parsed);
+        return;
+      }
+
+      void loadFreighterApi()
+        .then((freighterApi) => freighterApi.getAddress())
+        .then((response) => {
+          if (!response.address || response.error) {
+            window.localStorage.removeItem(STORAGE_KEY);
+            return;
+          }
+
+          const nextSession: WalletSession = {
+            address: response.address,
+            walletId: 'freighter',
+          };
+          setSession(nextSession);
+        })
+        .catch(() => {
+          window.localStorage.removeItem(STORAGE_KEY);
+        });
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
     }
-  }, []);
-
-  useEffect(() => {
-    if (isTestWalletEnabled()) {
-      return;
-    }
-
-    let offDisconnect: () => void = () => {};
-
-    void loadWalletKit().then(({ StellarWalletsKit, KitEventType }) => {
-      offDisconnect = StellarWalletsKit.on(KitEventType.DISCONNECT, () => {
-        setSession(null);
-        if (typeof window !== 'undefined') {
-          window.localStorage.removeItem(STORAGE_KEY);
-        }
-      });
-    });
-
-    return () => {
-      offDisconnect();
-    };
   }, []);
 
   const value = useMemo<WalletContextValue>(() => {
@@ -144,11 +160,10 @@ export function WalletProvider({
       errorMessage,
       clearWalletError: () => setErrorMessage(null),
       disconnectWallet: () => {
-        void loadWalletKit()
-          .then(({ StellarWalletsKit }) => StellarWalletsKit.disconnect())
-          .catch(() => undefined);
         setSession(null);
+        setLastWalletId(null);
         setConnectionLabel(null);
+        setErrorMessage(null);
 
         if (typeof window !== 'undefined') {
           window.localStorage.removeItem(STORAGE_KEY);
@@ -166,18 +181,19 @@ export function WalletProvider({
         }
 
         try {
-          const { StellarWalletsKit } = await loadWalletKit();
-          const response = await StellarWalletsKit.signTransaction(xdr, {
+          const freighterApi = await loadFreighterApi();
+          const response = await freighterApi.signTransaction(xdr, {
             address: signerAddress,
             networkPassphrase: stellarNetworkPassphrase,
           });
 
+          if (response.error) {
+            throw new Error(getFreighterErrorMessage(response));
+          }
+
           return response.signedTxXdr;
         } catch (error) {
-          const message =
-            error instanceof Error
-              ? error.message
-              : 'Unable to sign transaction with the connected wallet.';
+          const message = getFreighterErrorMessage(error);
 
           if (/cancel|reject|declin/i.test(message)) {
             throw new Error('Transaction cancelled by user.');
@@ -186,43 +202,52 @@ export function WalletProvider({
           throw new Error(message);
         }
       },
-      connectWallet: async (walletId) => {
+      connectWallet: async () => {
         setIsConnecting(true);
-        setConnectionLabel(`Connecting to ${walletId === 'xbull' ? 'xBull' : walletId.charAt(0).toUpperCase() + walletId.slice(1)}...`);
+        setConnectionLabel('Connecting to Freighter...');
         setErrorMessage(null);
 
         try {
-          if (!isWalletInstalled(walletId)) {
-            throw new Error('Wallet not installed');
-          }
-
-          let address = '';
-
           if (isTestWalletEnabled()) {
-            address = await resolveMockAddress(walletId);
-          } else {
-            const { StellarWalletsKit } = await loadWalletKit();
-            StellarWalletsKit.setWallet(walletId);
-            const response = await StellarWalletsKit.getAddress().catch(async () => {
-              return StellarWalletsKit.fetchAddress();
-            });
-            address = response.address;
+            const address = await resolveMockAddress();
+            const nextSession: WalletSession = { address, walletId: 'freighter' };
+            setSession(nextSession);
+            setLastWalletId('freighter');
+
+            if (typeof window !== 'undefined') {
+              window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextSession));
+            }
+
+            return;
           }
 
-          const nextSession: WalletSession = { address, walletId };
+          const freighterApi = await loadFreighterApi();
+          const response = await freighterApi.requestAccess();
+          if (response.error) {
+            throw new Error(getFreighterErrorMessage(response));
+          }
+
+          if (!response.address) {
+            throw new Error('Freighter did not return an address.');
+          }
+
+          const nextSession: WalletSession = {
+            address: response.address,
+            walletId: 'freighter',
+          };
           setSession(nextSession);
-          setLastWalletId(walletId);
+          setLastWalletId('freighter');
 
           if (typeof window !== 'undefined') {
             window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextSession));
           }
         } catch (error) {
-          const message =
-            error instanceof Error && error.message === 'Wallet not installed'
-              ? `Wallet not installed. Please install ${walletId === 'xbull' ? 'xBull' : walletId} and try again.`
-              : error instanceof Error
-                ? error.message
-                : 'Unable to connect wallet right now.';
+          const rawMessage = getFreighterErrorMessage(error);
+          const message = /not supported|browser extension is not available|could not establish connection|missing/i.test(
+            rawMessage,
+          )
+            ? 'Freighter is not installed. Please install Freighter and try again.'
+            : rawMessage;
           setErrorMessage(message);
           throw new Error(message);
         } finally {

@@ -1,4 +1,4 @@
-export type WalletId = 'freighter' | 'albedo' | 'xbull';
+export type WalletId = 'freighter';
 
 export type CampaignStatus = 'active' | 'funded' | 'ended';
 

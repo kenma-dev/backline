@@ -197,9 +197,10 @@ export default function CreateCampaignPage(): JSX.Element {
               {createMutation.isPending ? 'Processing transaction...' : 'Launch Campaign'}
             </button>
           </form>
-          <div className="mt-6">
-            <TransactionStatus state={txState} />
-          </div>
+          <TransactionStatus
+            state={txState}
+            onDismiss={() => setTxState({ status: 'idle' })}
+          />
           <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-ink/55">
             <span>Draft auto-saves in this browser.</span>
             <button

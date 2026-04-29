@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-const supportedWallets = ['Freighter', 'Albedo', 'xBull'];
+const supportedWallets = ['Freighter'];
 
 export function Hero(): JSX.Element {
   return (
@@ -8,7 +8,7 @@ export function Hero(): JSX.Element {
       <div className="absolute inset-y-0 right-0 hidden w-1/3 bg-[radial-gradient(circle_at_center,_rgba(255,122,69,0.25),_transparent_70%)] lg:block" />
       <div className="relative max-w-3xl">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ember">
-          Stellar Testnet Crowdfunding
+          Creator-first crowdfunding
         </p>
         <h1 className="mt-5 font-display text-4xl leading-tight text-ink sm:text-5xl lg:text-6xl">
           Fund artists, community projects, and live ideas with instant XLM support.

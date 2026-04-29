@@ -8,6 +8,18 @@ import { useCampaigns } from '@/hooks/use-campaigns';
 import { getCampaignStatus, matchesCampaignSearch } from '@/lib/format';
 import type { CampaignStatus } from '@/types';
 
+function getCampaignGroupRank(status: CampaignStatus): number {
+  if (status === 'active') {
+    return 0;
+  }
+
+  if (status === 'funded') {
+    return 1;
+  }
+
+  return 2;
+}
+
 export function CampaignGrid({
   featured = false,
   filter = 'all',
@@ -48,6 +60,14 @@ export function CampaignGrid({
     return getCampaignStatus(campaign) === filter && matchesCampaignSearch(campaign, searchTerm);
   });
   const sorted = [...filtered].sort((left, right) => {
+    const leftStatus = getCampaignStatus(left);
+    const rightStatus = getCampaignStatus(right);
+    const groupDiff = getCampaignGroupRank(leftStatus) - getCampaignGroupRank(rightStatus);
+
+    if (groupDiff !== 0) {
+      return groupDiff;
+    }
+
     if (sortBy === 'raised') {
       return right.raised - left.raised;
     }
@@ -67,7 +87,7 @@ export function CampaignGrid({
   return (
     <div>
       <div className="mb-5 flex items-center justify-between gap-4">
-        <LoadingSpinner label="Real-time updates every 30 seconds" size="sm" />
+        <LoadingSpinner label="Live updates" size="sm" />
         <CachedAt updatedAt={campaignsQuery.dataUpdatedAt} />
       </div>
       {visible.length === 0 ? (

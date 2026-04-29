@@ -15,9 +15,17 @@ export function CampaignCard({
   campaign: Campaign;
 }): JSX.Element {
   const status = getCampaignStatus(campaign);
+  const isEnded = status === 'ended';
 
   return (
-    <article className="glass-panel fade-in flex h-full flex-col rounded-[28px] border border-white/70 p-6 shadow-soft">
+    <article
+      className={`glass-panel fade-in relative flex h-full flex-col overflow-hidden rounded-[28px] border border-white/70 p-6 shadow-soft ${
+        isEnded ? 'opacity-80 saturate-75' : ''
+      }`}
+    >
+      {isEnded ? (
+        <div className="pointer-events-none absolute inset-0 bg-cream/45" aria-hidden="true" />
+      ) : null}
       <div className="flex items-start justify-between gap-4">
         <div>
           <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${badgeStyles[status]}`}>
@@ -58,7 +66,7 @@ export function CampaignCard({
       </dl>
       <Link
         href={`/campaign/${campaign.id}`}
-        className="mt-8 inline-flex items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90"
+        className="relative mt-8 inline-flex items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90"
       >
         View Details
       </Link>

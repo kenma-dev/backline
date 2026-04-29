@@ -214,11 +214,6 @@ export default function CampaignDetailsPage(): JSX.Element {
             onSelect={(value) => setAmount(String(value))}
           />
         ) : null}
-        {insufficientLabel ? (
-          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {insufficientLabel}
-          </div>
-        ) : null}
         <button
           type="button"
           onClick={async () => {
@@ -289,9 +284,10 @@ export default function CampaignDetailsPage(): JSX.Element {
               ? 'Campaign Closed'
               : 'Back This Campaign'}
         </button>
-        <div className="mt-5">
-          <TransactionStatus state={txState} />
-        </div>
+        <TransactionStatus
+          state={txState}
+          onDismiss={() => setTxState({ status: 'idle' })}
+        />
         {(canClaim || canRefund) && (
           <div className="mt-5 space-y-3">
             {canClaim ? (

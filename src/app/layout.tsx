@@ -7,7 +7,7 @@ import { Providers } from '@/components/providers';
 export const metadata: Metadata = {
   title: 'Backline | Stellar Crowdfund',
   description:
-    'Backline is a production-quality crowdfunding dApp for Stellar Testnet campaigns built with Next.js and Soroban.',
+    'Backline is a production-quality crowdfunding app for creators and supporters built with Next.js and Soroban.',
 };
 
 export default function RootLayout({

@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { BalancePill } from '@/components/balance-pill';
 import { WalletButton } from '@/components/wallet-button';
 import { useWallet } from '@/hooks/use-wallet';
 
@@ -16,9 +15,7 @@ export function Navbar(): JSX.Element {
             <Link href="/" className="font-display text-2xl font-bold text-ink">
               Backline
             </Link>
-            <p className="hidden text-xs uppercase tracking-[0.26em] text-ink/45 sm:block">
-              Stellar testnet crowdfunding
-            </p>
+            <p className="hidden text-xs uppercase tracking-[0.26em] text-ink/45 sm:block">Creator funding platform</p>
           </div>
           <nav className="hidden items-center gap-4 text-sm font-semibold text-ink/70 md:flex">
             <Link href="/campaigns">Campaigns</Link>
@@ -27,7 +24,6 @@ export function Navbar(): JSX.Element {
           </nav>
         </div>
         <div className="flex items-center gap-3">
-          <BalancePill address={session?.address ?? null} />
           <WalletButton />
         </div>
       </div>
