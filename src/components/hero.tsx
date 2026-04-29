@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+const supportedWallets = ['Freighter', 'Albedo', 'xBull'];
+
 export function Hero(): JSX.Element {
   return (
     <section className="fade-in glass-panel relative overflow-hidden rounded-[36px] border border-white/70 px-6 py-12 shadow-soft sm:px-10 lg:px-14 lg:py-16">
@@ -27,6 +29,19 @@ export function Hero(): JSX.Element {
           >
             Create Campaign
           </Link>
+        </div>
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          <span className="text-xs font-semibold uppercase tracking-[0.26em] text-ink/45">
+            Works with
+          </span>
+          {supportedWallets.map((wallet) => (
+            <span
+              key={wallet}
+              className="rounded-full border border-white/80 bg-white/75 px-3 py-2 text-sm font-semibold text-ink/75"
+            >
+              {wallet}
+            </span>
+          ))}
         </div>
       </div>
     </section>

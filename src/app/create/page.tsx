@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/use-create-campaign';
 import { useWallet } from '@/hooks/use-wallet';
+import { LoadingOverlay } from '@/components/loading-overlay';
 import { TransactionStatus } from '@/components/transaction-status';
 import { fromDateInputValue, toDateInputValue } from '@/lib/format';
 import type { CampaignFormValues, TransactionState } from '@/types';
@@ -24,12 +25,18 @@ export default function CreateCampaignPage(): JSX.Element {
 
   return (
     <div className="mx-auto w-full max-w-3xl">
-      <section className="glass-panel rounded-[32px] border border-white/70 p-8 shadow-soft">
+      <section className="glass-panel relative rounded-[32px] border border-white/70 p-8 shadow-soft">
+        {createMutation.isPending ? <LoadingOverlay label="Creating campaign..." /> : null}
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-ink/45">Launch a campaign</p>
         <h1 className="mt-3 font-display text-4xl text-ink">Create your Backline page</h1>
         <p className="mt-4 text-base leading-8 text-ink/72">
           Add a clear title, explain the story, set an XLM target, and choose a deadline.
         </p>
+        {!session?.address ? (
+          <div className="mt-6 rounded-3xl border border-sun/35 bg-sun/15 p-4 text-sm text-amber-900">
+            Connect a wallet first so the campaign can be created under your Stellar address.
+          </div>
+        ) : null}
         <form
           className="mt-8 space-y-5"
           onSubmit={async (event) => {
@@ -149,7 +156,7 @@ export default function CreateCampaignPage(): JSX.Element {
           </div>
           <button
             type="submit"
-            disabled={createMutation.isPending}
+            disabled={createMutation.isPending || !session?.address}
             className="inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {createMutation.isPending ? 'Processing transaction...' : 'Launch Campaign'}

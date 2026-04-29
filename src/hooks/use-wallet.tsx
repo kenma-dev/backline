@@ -8,6 +8,7 @@ const TEST_WALLET_KEY = '__BACKLINE_TEST_WALLET__';
 
 interface WalletContextValue {
   session: WalletSession | null;
+  lastWalletId: WalletId | null;
   isConnecting: boolean;
   connectionLabel: string | null;
   errorMessage: string | null;
@@ -80,6 +81,7 @@ export function WalletProvider({
   children: React.ReactNode;
 }): JSX.Element {
   const [session, setSession] = useState<WalletSession | null>(null);
+  const [lastWalletId, setLastWalletId] = useState<WalletId | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionLabel, setConnectionLabel] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -98,7 +100,9 @@ export function WalletProvider({
     }
 
     try {
-      setSession(JSON.parse(stored) as WalletSession);
+      const parsed = JSON.parse(stored) as WalletSession;
+      setSession(parsed);
+      setLastWalletId(parsed.walletId);
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
     }
@@ -124,6 +128,7 @@ export function WalletProvider({
   const value = useMemo<WalletContextValue>(() => {
     return {
       session,
+      lastWalletId,
       isConnecting,
       connectionLabel,
       errorMessage,
@@ -164,6 +169,7 @@ export function WalletProvider({
 
           const nextSession: WalletSession = { address, walletId };
           setSession(nextSession);
+          setLastWalletId(walletId);
 
           if (typeof window !== 'undefined') {
             window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextSession));
@@ -183,7 +189,7 @@ export function WalletProvider({
         }
       },
     };
-  }, [connectionLabel, errorMessage, isConnecting, session]);
+  }, [connectionLabel, errorMessage, isConnecting, lastWalletId, session]);
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
 }

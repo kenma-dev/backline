@@ -10,6 +10,7 @@ import { useClaimFunds } from '@/hooks/use-claim-funds';
 import { useRefundCampaign } from '@/hooks/use-refund-campaign';
 import { CachedAt } from '@/components/cached-at';
 import { LoadingSpinner } from '@/components/loading-spinner';
+import { LoadingOverlay } from '@/components/loading-overlay';
 import { ProgressBar } from '@/components/progress-bar';
 import { TransactionStatus } from '@/components/transaction-status';
 import { formatXlm, getCampaignStatus, getDaysRemaining, truncateAddress } from '@/lib/format';
@@ -135,7 +136,10 @@ export default function CampaignDetailsPage(): JSX.Element {
         </div>
       </section>
 
-      <aside className="glass-panel sticky top-28 h-fit rounded-[32px] border border-white/70 p-8 shadow-soft">
+      <aside className="glass-panel sticky top-28 relative h-fit rounded-[32px] border border-white/70 p-8 shadow-soft">
+        {backMutation.isPending || claimMutation.isPending || refundMutation.isPending ? (
+          <LoadingOverlay label="Updating campaign..." />
+        ) : null}
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-ink/45">Back this campaign</p>
         <h2 className="mt-3 font-display text-3xl text-ink">Support with XLM</h2>
         <p className="mt-3 text-sm leading-7 text-ink/68">

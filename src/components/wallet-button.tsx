@@ -8,7 +8,7 @@ import { useWallet } from '@/hooks/use-wallet';
 export function WalletButton(): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
-  const { session, connectWallet, disconnectWallet, isConnecting, connectionLabel, errorMessage } =
+  const { session, lastWalletId, connectWallet, disconnectWallet, isConnecting, connectionLabel, errorMessage } =
     useWallet();
   const selectedWallet = walletOptions.find((wallet) => wallet.id === selectedWalletId);
 
@@ -76,7 +76,14 @@ export function WalletButton(): JSX.Element {
                   className="flex w-full items-center justify-between rounded-3xl border border-white/80 bg-white/80 px-4 py-4 text-left transition hover:border-ember/40 hover:bg-white"
                 >
                   <span>
-                    <span className="block font-semibold text-ink">{wallet.name}</span>
+                    <span className="block font-semibold text-ink">
+                      {wallet.name}
+                      {lastWalletId === wallet.id ? (
+                        <span className="ml-2 rounded-full bg-sun/25 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-amber-900">
+                          Last used
+                        </span>
+                      ) : null}
+                    </span>
                     <span className="mt-1 block text-sm text-ink/65">{wallet.description}</span>
                   </span>
                   <span className="text-sm font-semibold text-ember">Connect</span>
