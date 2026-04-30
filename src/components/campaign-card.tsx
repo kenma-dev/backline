@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { LiveBadge } from '@/components/live-badge';
 import { formatCountdownLabel, formatXlm, getCampaignStatus, truncateAddress } from '@/lib/format';
 import type { Campaign, CampaignStatus } from '@/types';
 import { ProgressBar } from '@/components/progress-bar';
@@ -36,7 +37,10 @@ export function CampaignCard({
               claimed
             </span>
           ) : null}
-          <h3 className="mt-4 font-display text-2xl text-ink">{campaign.title}</h3>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <h3 className="font-display text-2xl text-ink">{campaign.title}</h3>
+            {!isEnded ? <LiveBadge /> : null}
+          </div>
         </div>
         <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-ink/60">
           {formatCountdownLabel(campaign.deadline)}
@@ -66,7 +70,7 @@ export function CampaignCard({
       </dl>
       <Link
         href={`/campaign/${campaign.id}`}
-        className="relative mt-8 inline-flex items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90"
+        className="relative mt-8 inline-flex min-h-11 items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90"
       >
         View Details
       </Link>

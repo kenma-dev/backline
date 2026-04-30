@@ -8,19 +8,24 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
+    "lint": "pnpm exec tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "contract:test": "cargo test --manifest-path contracts/crowdfund/Cargo.toml",
-    "contract:build": "cargo build --target wasm32v1-none --release --manifest-path contracts/crowdfund/Cargo.toml"
+    "contract:build": "cargo build --target wasm32v1-none --release --manifest-path contracts/crowdfund/Cargo.toml",
+    "contract:test:reward": "cargo test --manifest-path contracts/reward-token/Cargo.toml",
+    "contract:build:reward": "cargo build --target wasm32v1-none --release --manifest-path contracts/reward-token/Cargo.toml"
   },
   "dependencies": {
     "@stellar/freighter-api": "6.0.1",
     "@stellar/stellar-sdk": "15.0.1",
     "@tanstack/react-query": "5.100.6",
     "clsx": "2.1.1",
+    "lucide-react": "0.552.0",
     "next": "16.2.4",
     "react": "19.2.5",
-    "react-dom": "19.2.5"
+    "react-dom": "19.2.5",
+    "sonner": "2.0.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.2.4",

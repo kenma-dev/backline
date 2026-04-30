@@ -18,6 +18,7 @@ import { LoadingOverlay } from '@/components/loading-overlay';
 import { ProgressBar } from '@/components/progress-bar';
 import { SupportSuggestions } from '@/components/support-suggestions';
 import { TransactionStatus } from '@/components/transaction-status';
+import { useRealtimeEvents } from '@/hooks/use-realtime-events';
 import {
   formatDeadline,
   formatXlm,
@@ -39,6 +40,8 @@ export default function CampaignDetailsPage(): JSX.Element {
   const refundMutation = useRefundCampaign(session?.address ?? null);
   const [amount, setAmount] = useState('25');
   const [txState, setTxState] = useState<TransactionState>({ status: 'idle' });
+
+  useRealtimeEvents(Number.isFinite(campaignId) ? campaignId : undefined);
 
   const insufficientLabel = useMemo(() => {
     const numericAmount = Number(amount);
@@ -196,7 +199,7 @@ export default function CampaignDetailsPage(): JSX.Element {
           step="0.01"
           value={amount}
           onChange={(event) => setAmount(event.target.value)}
-          className="mt-2 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 outline-none transition focus:border-ember"
+          className="mt-2 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 text-base outline-none transition focus:border-ember min-h-11"
         />
         <div className="mt-4 rounded-3xl border border-white/70 bg-white/70 p-4">
           <p className="text-sm text-ink/55">Your balance</p>
