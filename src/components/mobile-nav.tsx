@@ -31,11 +31,11 @@ export function MobileNav(): JSX.Element {
         <>
           <button
             type="button"
-            className="fixed inset-0 z-30 bg-ink/20 backdrop-blur-sm"
+            className="fixed inset-0 z-30"
             onClick={() => setIsOpen(false)}
             aria-label="Close navigation menu"
           />
-          <div className="fixed inset-x-4 top-20 z-40 rounded-[28px] border border-white/70 bg-cream/95 p-4 shadow-soft">
+          <div className="fixed inset-x-4 top-20 z-40 rounded-[28px] border border-white/70 bg-cream p-4 shadow-soft">
             <nav className="flex flex-col gap-3">
               <Link href="/campaigns" className={navLinkClassName} onClick={() => setIsOpen(false)}>
                 Campaigns

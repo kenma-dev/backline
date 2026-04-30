@@ -19,7 +19,7 @@ export function WalletButton(): JSX.Element {
     return (
       <>
         <div className="flex items-center gap-3">
-          <div className="rounded-full border border-white/60 bg-white/75 px-4 py-2 text-sm font-semibold text-ink">
+          <div className="rounded-full border border-white/60 bg-white/75 px-4 py-2 text-sm font-semibold text-ink hidden md:flex">
             Freighter connected
           </div>
           <button
