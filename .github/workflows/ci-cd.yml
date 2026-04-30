@@ -1,0 +1,76 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-test-build:
+    name: Lint, Test and Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm exec tsc --noEmit
+
+      - name: Frontend tests
+        run: pnpm test
+
+      - name: Crowdfund contract tests
+        run: pnpm contract:test
+
+      - name: Reward token contract tests
+        run: pnpm contract:test:reward
+
+      - name: Build application
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_NETWORK: testnet
+          NEXT_PUBLIC_CONTRACT_ID: ${{ secrets.CONTRACT_ID }}
+          NEXT_PUBLIC_REWARD_TOKEN_ID: ${{ secrets.REWARD_TOKEN_ID }}
+          NEXT_PUBLIC_SOROBAN_RPC_URL: https://soroban-testnet.stellar.org
+          NEXT_PUBLIC_HORIZON_URL: https://horizon-testnet.stellar.org
+          NEXT_PUBLIC_STELLAR_EXPERT_URL: https://stellar.expert/explorer/testnet
+
+      - name: Upload Next build
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: .next
+
+  deploy:
+    name: Deploy to Vercel
+    needs: lint-test-build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: --prod
