@@ -64,34 +64,27 @@ Backline now satisfies the core Level 4 requirements:
 
 - Demo video: [Watch on Youtube](https://youtu.be/jTLjVX4klvo)
 
-- Contract on Stellar Lab:
-  `https://lab.stellar.org/r/testnet/contract/CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX`
-  
-- Deploy transaction on Stellar Expert:
-  `https://stellar.expert/explorer/testnet/tx/d9ee7961280a9ac8df7ec633e0534e108b47b29dbae542ee70697f80a4b50e19`
-
-- Upgraded Level 4 crowdfund contract on Stellar Lab:
-  `https://lab.stellar.org/r/testnet/contract/CDFNRRO337HJY6VCJQWCOM2ATHEPMTZ3I7KK4HCWA5TEOWEZZG37HFMP`
-
-- Upgraded Level 4 crowdfund deploy transaction:
-  `https://stellar.expert/explorer/testnet/tx/9982e8c1eb88ce2daa650ef091a2c50cd6fbcd016d0cabbaed7e9f13b47c4cee`
-
 ## Live contract details
 
 - Contract ID:
-  `CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX`
+  [CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX](https://stellar.expert/explorer/testnet/contract/CD3FVQNCYZW3WCHVQK2QFTDUX7SUP5RYPY2O5O5C375R3O466ZXWB4HX)
 
 - Upgraded Level 4 Contract ID:
-  `CDFNRRO337HJY6VCJQWCOM2ATHEPMTZ3I7KK4HCWA5TEOWEZZG37HFMP`
+  [CDFNRRO337HJY6VCJQWCOM2ATHEPMTZ3I7KK4HCWA5TEOWEZZG37HFMP](https://stellar.expert/explorer/testnet/contract/CDFNRRO337HJY6VCJQWCOM2ATHEPMTZ3I7KK4HCWA5TEOWEZZG37HFMP)
+
+
+- Deploy transaction on Stellar Expert:
+  [9982e8c1eb88ce2daa650ef091a2c50cd6fbcd016d0cabbaed7e9f13b47c4cee](https://stellar.expert/explorer/testnet/tx/9982e8c1eb88ce2daa650ef091a2c50cd6fbcd016d0cabbaed7e9f13b47c4cee)
 
 - Reward Token Contract ID:
-  `CDH7RDPLWMQZM47SANN2ZF2MBFVMVG7MGWYAUJID2OI4TQYVH3CDPFDT`
+  [CDH7RDPLWMQZM47SANN2ZF2MBFVMVG7MGWYAUJID2OI4TQYVH3CDPFDT](https://stellar.expert/explorer/testnet/contract/CDH7RDPLWMQZM47SANN2ZF2MBFVMVG7MGWYAUJID2OI4TQYVH3CDPFDT)
 
 - Reward Token Deploy Transaction:
-  `https://stellar.expert/explorer/testnet/tx/9ba9b3c68f6c7652dd167613bd0cb61b2facda941116a679d54f79c776fe311b`
+  [9ba9b3c68f6c7652dd167613bd0cb61b2facda941116a679d54f79c776fe311b](https://stellar.expert/explorer/testnet/tx/9ba9b3c68f6c7652dd167613bd0cb61b2facda941116a679d54f79c776fe311b)
 
 - Real Inter-Contract Backing Transaction:
-  `https://stellar.expert/explorer/testnet/tx/915da303080fdd226ebc4b309019f01184d895bd68028678c1ac751e446c9f65`
+  [915da303080fdd226ebc4b309019f01184d895bd68028678c1ac751e446c9f65](https://stellar.expert/explorer/testnet/tx/915da303080fdd226ebc4b309019f01184d895bd68028678c1ac751e446c9f65)
+
 
 - Verified reward outcome:
   backing `2 XLM` minted `20 BLR` to the backer wallet on testnet
@@ -114,25 +107,50 @@ Backline now satisfies the core Level 4 requirements:
 ## Screenshots
 
 ### Hero Section
-![hero-section](image.png)
-
-### Campaign Listing
-![campaign-listing](image-1.png)
-
-### Detailed Campaign page
-![campaign-page](image-2.png)
-
-### Dashboard
-![dashboard](image-3.png)
-
-### Create Campaign
-![create-campaign](image-4.png)
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <strong>Hero Section</strong><br />
+      <img src="image.png" alt="hero-section" width="420" />
+    </td>
+    <td align="center" width="50%">
+      <strong>Campaign Listing</strong><br />
+      <img src="image-1.png" alt="campaign-listing" width="420" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <strong>Detailed Campaign Page</strong><br />
+      <img src="image-2.png" alt="campaign-page" width="420" />
+    </td>
+    <td align="center" width="50%">
+      <strong>Dashboard</strong><br />
+      <img src="image-3.png" alt="dashboard" width="420" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <strong>Create Campaign</strong><br />
+      <img src="image-4.png" alt="create-campaign" width="420" />
+    </td>
+    <td align="center" width="50%"></td>
+  </tr>
+</table>
 
 
 ### Mobile screenshots
-![home-page](image-6.png)
-
-![dashboard](image-7.png)
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <strong>Mobile Home</strong><br />
+      <img src="image-6.png" alt="home-page" width="240" />
+    </td>
+    <td align="center" width="50%">
+      <strong>Mobile Dashboard</strong><br />
+      <img src="image-7.png" alt="dashboard" width="240" />
+    </td>
+  </tr>
+</table>
 
 ### Test Cases Passed(3)
 ![test-cases](image-5.png)
