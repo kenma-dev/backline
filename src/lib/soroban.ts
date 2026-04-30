@@ -25,12 +25,24 @@ function getServer(): rpc.Server {
   return new rpc.Server(env.sorobanRpcUrl);
 }
 
+export function getSorobanServer(): rpc.Server {
+  return getServer();
+}
+
 function getContract(): Contract {
   if (!env.contractId) {
     throw new Error('Missing NEXT_PUBLIC_CONTRACT_ID for Soroban contract mode.');
   }
 
   return new Contract(env.contractId);
+}
+
+function getContractById(contractId: string): Contract {
+  if (!contractId) {
+    throw new Error('Missing contract ID for Soroban contract read.');
+  }
+
+  return new Contract(contractId);
 }
 
 function getInvokeErrorMessage(message: string): string {
@@ -102,7 +114,15 @@ export async function simulateContractCall<T>(
   method: string,
   args: xdr.ScVal[],
 ): Promise<T> {
-  const contract = getContract();
+  return simulateContractCallById<T>(env.contractId, method, args);
+}
+
+export async function simulateContractCallById<T>(
+  contractId: string,
+  method: string,
+  args: xdr.ScVal[],
+): Promise<T> {
+  const contract = getContractById(contractId);
   const server = getServer();
   const transaction = new TransactionBuilder(new Account(NULL_ACCOUNT, '0'), {
     fee: BASE_FEE,

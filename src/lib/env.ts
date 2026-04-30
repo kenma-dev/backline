@@ -3,6 +3,10 @@ export const env = {
     process.env.NEXT_PUBLIC_NETWORK ?? process.env.VITE_NETWORK ?? 'testnet',
   contractId:
     process.env.NEXT_PUBLIC_CONTRACT_ID ?? process.env.VITE_CONTRACT_ID ?? '',
+  rewardTokenId:
+    process.env.NEXT_PUBLIC_REWARD_TOKEN_ID ??
+    process.env.VITE_REWARD_TOKEN_ID ??
+    '',
   sorobanRpcUrl:
     process.env.NEXT_PUBLIC_SOROBAN_RPC_URL ??
     process.env.VITE_SOROBAN_RPC_URL ??

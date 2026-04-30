@@ -4,12 +4,15 @@ import Link from 'next/link';
 import { CampaignCollection } from '@/components/campaign-collection';
 import { ConnectedOverview } from '@/components/connected-overview';
 import { EmptyState } from '@/components/empty-state';
+import { useRewardBalance, useRewardMetadata } from '@/hooks/use-reward-balance';
 import { useUserCampaigns } from '@/hooks/use-user-campaigns';
 import { useWallet } from '@/hooks/use-wallet';
 
 export default function DashboardPage(): JSX.Element {
   const { session } = useWallet();
   const { created, backed, claimable, refundable } = useUserCampaigns();
+  const rewardBalanceQuery = useRewardBalance(session?.address ?? null);
+  const rewardMetadataQuery = useRewardMetadata();
 
   if (!session?.address) {
     return (
@@ -24,8 +27,8 @@ export default function DashboardPage(): JSX.Element {
   }
 
   return (
-    <div className="space-y-10">
-      <section className="glass-panel rounded-[32px] border border-white/70 p-8 shadow-soft">
+    <div className="space-y-8 sm:space-y-10">
+      <section className="glass-panel rounded-[32px] border border-white/70 p-6 shadow-soft sm:p-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-ink/45">Dashboard</p>
@@ -44,6 +47,26 @@ export default function DashboardPage(): JSX.Element {
       </section>
 
       <ConnectedOverview />
+
+      <section className="rounded-[32px] border border-purple-200 bg-gradient-to-br from-purple-50 via-white to-sky-50 p-6 shadow-soft sm:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-purple-700/70">Rewards</p>
+            <h2 className="mt-2 font-display text-3xl text-purple-950">Your BLR balance</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-purple-950/70">
+              Every 1 XLM backed earns 10 BLR through an on-chain inter-contract mint.
+            </p>
+          </div>
+          <div className="rounded-[28px] border border-purple-200 bg-white/80 px-6 py-5 text-left shadow-soft">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-purple-700/65">
+              {rewardMetadataQuery.data?.symbol ?? 'BLR'} earned
+            </p>
+            <p className="mt-2 font-display text-4xl text-purple-950">
+              {(rewardBalanceQuery.data ?? 0).toFixed(2)}
+            </p>
+          </div>
+        </div>
+      </section>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="glass-panel rounded-[28px] border border-white/70 p-6 shadow-soft">
