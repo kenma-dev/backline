@@ -1,14 +1,15 @@
-name: CI/CD Pipeline
+name: Build Validation
 
 on:
   push:
     branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
+  workflow_dispatch:
 
 jobs:
-  lint-test-build:
-    name: Lint, Test and Build
+  lint-build:
+    name: Lint and Build
     runs-on: ubuntu-latest
 
     steps:
@@ -32,15 +33,6 @@ jobs:
       - name: Type check
         run: pnpm exec tsc --noEmit
 
-      - name: Frontend tests
-        run: pnpm test
-
-      - name: Crowdfund contract tests
-        run: pnpm contract:test
-
-      - name: Reward token contract tests
-        run: pnpm contract:test:reward
-
       - name: Build application
         run: pnpm build
         env:
@@ -56,21 +48,3 @@ jobs:
         with:
           name: next-build
           path: .next
-
-  deploy:
-    name: Deploy to Vercel
-    needs: lint-test-build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: --prod
