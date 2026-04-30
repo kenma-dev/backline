@@ -1,7 +1,21 @@
-import { CampaignGrid } from '@/components/campaign-grid';
+import dynamic from 'next/dynamic';
+import { CampaignSkeleton } from '@/components/campaign-skeleton';
 import { Hero } from '@/components/hero';
 import { HomeHighlights } from '@/components/home-highlights';
 import { RecentActivity } from '@/components/recent-activity';
+
+const CampaignGrid = dynamic(
+  () => import('@/components/campaign-grid').then((mod) => mod.CampaignGrid),
+  {
+    loading: () => (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <CampaignSkeleton key={index} />
+        ))}
+      </div>
+    ),
+  },
+);
 
 export default function HomePage(): JSX.Element {
   return (

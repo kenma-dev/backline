@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { backCampaign } from '@/lib/contract-client';
+import { retryTransaction } from '@/lib/transaction-retry';
 import { useWallet } from '@/hooks/use-wallet';
 
 export function useBackCampaign(address: string | null) {
@@ -20,12 +21,15 @@ export function useBackCampaign(address: string | null) {
         throw new Error('Connect a wallet before backing a campaign.');
       }
 
-      return backCampaign(campaignId, address, amount, signTransaction);
+      return retryTransaction(() =>
+        backCampaign(campaignId, address, amount, signTransaction),
+      );
     },
     onSuccess: async ({ campaign }) => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['campaigns'] }),
         queryClient.invalidateQueries({ queryKey: ['balance'] }),
+        queryClient.invalidateQueries({ queryKey: ['rewardBalance'] }),
       ]);
       queryClient.setQueryData(['campaign', campaign.id], campaign);
     },
