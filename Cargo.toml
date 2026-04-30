@@ -1,5 +1,5 @@
 [workspace]
-members = ["contracts/crowdfund"]
+members = ["contracts/crowdfund", "contracts/reward-token"]
 resolver = "2"
 
 [workspace.package]
