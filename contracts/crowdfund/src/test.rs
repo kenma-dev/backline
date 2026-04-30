@@ -4,6 +4,7 @@ use soroban_sdk::testutils::{Address as _, Ledger};
 use soroban_sdk::{Address, Env, String};
 
 use crate::{ContractError, CrowdfundContract, CrowdfundContractClient};
+use reward_token::{RewardToken, RewardTokenClient};
 
 fn create_campaign_fixture(
     env: &Env,
@@ -64,6 +65,38 @@ fn tracks_backers_and_total_raised() {
 
     assert_eq!(client.get_total_raised(&campaign_id), 400);
     assert_eq!(client.get_backers_count(&campaign_id), 2);
+}
+
+#[test]
+fn mints_reward_tokens_when_configured() {
+    let env = Env::default();
+    env.mock_all_auths();
+    env.ledger().with_mut(|ledger| {
+        ledger.timestamp = 100;
+    });
+
+    let admin = Address::generate(&env);
+    let creator = Address::generate(&env);
+    let backer = Address::generate(&env);
+    let crowdfund_id = env.register(CrowdfundContract, ());
+    let reward_token_id = env.register(RewardToken, ());
+    let crowdfund_client = CrowdfundContractClient::new(&env, &crowdfund_id);
+    let reward_token_client = RewardTokenClient::new(&env, &reward_token_id);
+
+    reward_token_client.initialize(
+        &crowdfund_id.clone().into(),
+        &String::from_str(&env, "Backline Reward"),
+        &String::from_str(&env, "BLR"),
+        &7,
+    );
+    crowdfund_client.initialize_admin(&admin);
+    crowdfund_client.set_reward_token(&admin, &reward_token_id.clone().into());
+
+    let campaign_id = create_campaign_fixture(&env, &crowdfund_client, &creator, 1_000, 1_500);
+    crowdfund_client.back_campaign(&campaign_id, &backer, &20_000_000);
+
+    assert_eq!(reward_token_client.balance(&backer), 200_000_000);
+    assert_eq!(reward_token_client.total_supply(), 200_000_000);
 }
 
 #[test]
