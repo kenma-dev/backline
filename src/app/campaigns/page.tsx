@@ -22,7 +22,7 @@ export default function CampaignsPage(): JSX.Element {
 
   return (
     <div className="space-y-8">
-      <section className="glass-panel rounded-[32px] border border-white/70 p-8 shadow-soft">
+      <section className="glass-panel rounded-[32px] border border-white/70 p-6 shadow-soft sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-ink/45">Campaigns</p>
         <h1 className="mt-3 font-display text-4xl text-ink">Browse every Backline project</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-ink/72">
@@ -65,7 +65,7 @@ export default function CampaignsPage(): JSX.Element {
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder="Search by title, description, or creator"
-              className="mt-2 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-ember"
+              className="mt-2 min-h-11 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 text-base outline-none transition focus:border-ember"
             />
           </label>
           <label className="block">
@@ -75,7 +75,7 @@ export default function CampaignsPage(): JSX.Element {
               onChange={(event) =>
                 setSortBy(event.target.value as 'deadline' | 'raised' | 'goal' | 'backers')
               }
-              className="mt-2 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-ember"
+              className="mt-2 min-h-11 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 text-base outline-none transition focus:border-ember"
             >
               <option value="deadline">Nearest deadline</option>
               <option value="raised">Most raised</option>

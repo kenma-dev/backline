@@ -56,7 +56,7 @@ export default function CreateCampaignPage(): JSX.Element {
     <div className="space-y-8">
       <AppModePanel />
       <div className="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-        <section className="glass-panel relative rounded-[32px] border border-white/70 p-8 shadow-soft">
+        <section className="glass-panel relative rounded-[32px] border border-white/70 p-6 shadow-soft sm:p-8">
           {createMutation.isPending ? <LoadingOverlay label="Creating campaign..." /> : null}
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-ink/45">Launch a campaign</p>
           <h1 className="mt-3 font-display text-4xl text-ink">Create your Backline page</h1>
@@ -132,7 +132,7 @@ export default function CreateCampaignPage(): JSX.Element {
                 onChange={(event) =>
                   setValues((current) => ({ ...current, title: event.target.value }))
                 }
-                className="mt-2 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 outline-none transition focus:border-ember"
+                className="mt-2 min-h-11 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 text-base outline-none transition focus:border-ember"
                 required
               />
             </div>
@@ -146,7 +146,7 @@ export default function CreateCampaignPage(): JSX.Element {
                 onChange={(event) =>
                   setValues((current) => ({ ...current, description: event.target.value }))
                 }
-                className="mt-2 min-h-40 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 outline-none transition focus:border-ember"
+                className="mt-2 min-h-40 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 text-base outline-none transition focus:border-ember"
                 required
               />
             </div>
@@ -166,7 +166,7 @@ export default function CreateCampaignPage(): JSX.Element {
                       goal: Number(event.target.value),
                     }))
                   }
-                  className="mt-2 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 outline-none transition focus:border-ember"
+                  className="mt-2 min-h-11 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 text-base outline-none transition focus:border-ember"
                   required
                 />
               </div>
@@ -184,7 +184,7 @@ export default function CreateCampaignPage(): JSX.Element {
                       deadline: fromDateInputValue(event.target.value),
                     }))
                   }
-                  className="mt-2 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 outline-none transition focus:border-ember"
+                  className="mt-2 min-h-11 w-full rounded-2xl border border-ink/10 bg-white/90 px-4 py-3 text-base outline-none transition focus:border-ember"
                   required
                 />
               </div>
@@ -192,7 +192,7 @@ export default function CreateCampaignPage(): JSX.Element {
             <button
               type="submit"
               disabled={createMutation.isPending || !session?.address}
-              className="inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-70"
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {createMutation.isPending ? 'Processing transaction...' : 'Launch Campaign'}
             </button>

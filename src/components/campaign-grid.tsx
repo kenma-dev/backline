@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { CampaignSkeleton } from '@/components/campaign-skeleton';
 import { CampaignCard } from '@/components/campaign-card';
 import { CachedAt } from '@/components/cached-at';
 import { LoadingSpinner } from '@/components/loading-spinner';
@@ -35,9 +36,9 @@ export function CampaignGrid({
 
   if (campaignsQuery.isLoading) {
     return (
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
         {Array.from({ length: featured ? 3 : 6 }).map((_, index) => (
-          <div key={index} className="shimmer h-[320px] rounded-[28px] bg-white/75" />
+          <CampaignSkeleton key={index} />
         ))}
       </div>
     );
@@ -109,7 +110,7 @@ export function CampaignGrid({
           </div>
         </div>
       ) : (
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
         {visible.map((campaign) => (
           <CampaignCard key={campaign.id} campaign={campaign} />
         ))}
